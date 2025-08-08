@@ -1,5 +1,6 @@
 import {
   Sparkles,
+  Gamepad2,
   Wallet,
   Info,
   ChevronLeft,
@@ -37,7 +38,7 @@ const Dashboard = () => {
   return (
     <div className="px-4 py-8 md:py-12">
       <section className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-        <div className="p-6 md:p-8 rounded-[20px] bg-white/45 dark:bg-black/35 border border-white/35 dark:border-white/10 backdrop-blur-[14px] shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
+        <div className="p-6 md:p-8 rounded-[20px] bg-white/45 dark:bg-black/35 border border-white/35 dark:border-white/10 backdrop-blur-md shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
           <div className="flex items-center gap-2 text-xs uppercase tracking-widest text-gray-700 dark:text-gray-300">
             <Sparkles className="w-4 h-4 text-[#D4AA7D]" />
             <span>Futuristic Match-3</span>
@@ -70,7 +71,7 @@ const Dashboard = () => {
           </div>
         </div>
 
-        <div className="p-6 md:p-8 rounded-[20px] bg-white/45 dark:bg-black/35 border border-white/35 dark:border-white/10 backdrop-blur-[14px] shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
+        <div className="p-6 md:p-8 rounded-[20px] bg-white/45 dark:bg-black/35 border border-white/35 dark:border-white/10 backdrop-blur-md shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-xl md:text-2xl font-bold">Featured Avatars</h3>
             <div className="flex gap-2">
@@ -105,7 +106,7 @@ const Dashboard = () => {
                       <div className="font-bold">{nft.name}</div>
                       <div className="text-xs opacity-75">{nft.rarity}</div>
                     </div>
-                    <span className="px-2 py-1 rounded-lg bg-[#D4AA7D] text-black text-xs font-bold">
+                    <span className="cursor-pointer px-2 py-1 rounded-lg bg-[#D4AA7D] text-black text-xs font-bold">
                       NFT
                     </span>
                   </div>
@@ -113,6 +114,53 @@ const Dashboard = () => {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      <section className="mt-12 md:mt-20 grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="p-6 bg-white/45 dark:bg-black/35 backdrop-blur-md rounded-2xl border border-white/35 dark:border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
+          <div className="flex items-center gap-3">
+            <Gamepad2 className="w-5 h-5 text-[#D4AA7D]" />
+            <h3 className="text-xl font-bold">How it works</h3>
+          </div>
+          <p className="mt-3 text-gray-800/90 dark:text-gray-200/90">
+            Swap adjacent tiles to form matches of 3+ in a row. Clear combos,
+            chain reactions, and earn points against the clock.
+          </p>
+          <span className="cursor-pointer mt-4 inline-flex items-center text-[#D4AA7D] hover:text-[#EFD09E] transition">
+            Play the demo
+            <ChevronRight className="w-4 h-4 ml-1" />
+          </span>
+        </div>
+
+        <div className="p-6 bg-white/45 dark:bg-black/35 backdrop-blur-md rounded-2xl border border-white/35 dark:border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
+          <div className="flex items-center gap-3">
+            <Sparkles className="w-5 h-5 text-[#D4AA7D]" />
+            <h3 className="text-xl font-bold">Earn NFTs</h3>
+          </div>
+          <p className="mt-3 text-gray-800/90 dark:text-gray-200/90">
+            Power up and collect NFT characters. Complete challenges to unlock
+            traits and rare skins that boost your gameplay.
+          </p>
+          <span className="cursor-pointer mt-4 inline-flex items-center text-[#D4AA7D] hover:text-[#EFD09E] transition">
+            See rewards
+            <ChevronRight className="w-4 h-4 ml-1" />
+          </span>
+        </div>
+
+        <div className="p-6 bg-white/45 dark:bg-black/35 backdrop-blur-md rounded-2xl border border-white/35 dark:border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
+          <div className="flex items-center gap-3">
+            <Info className="w-5 h-5 text-[#D4AA7D]" />
+            <h3 className="text-xl font-bold">Play Missions</h3>
+          </div>
+          <p className="mt-3 text-gray-800/90 dark:text-gray-200/90">
+            Take on daily and seasonal missions via Honeycomb Protocol to earn
+            Nectar, XP, and token rewards.
+          </p>
+          <span className="cursor-pointer mt-4 inline-flex items-center text-[#D4AA7D] hover:text-[#EFD09E] transition">
+            Explore missions
+            <ChevronRight className="w-4 h-4 ml-1" />
+          </span>
         </div>
       </section>
     </div>
