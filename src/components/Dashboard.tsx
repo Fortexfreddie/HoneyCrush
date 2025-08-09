@@ -54,10 +54,16 @@ const Dashboard = () => {
             and collect on-chain rewards.
           </p>
           <div className="mt-6 flex flex-col sm:flex-row gap-3">
-            <Button className="w-full sm:w-auto bg-[#D4AA7D] hover:bg-[#EFD09E] text-black">
+            <Button
+              onClick={() => navigate("/game")}
+              className="w-full sm:w-auto bg-[#D4AA7D] hover:bg-[#EFD09E] text-black"
+            >
               Start Playing
             </Button>
-            <Button className="w-full sm:w-auto bg-transparent border-2 border-[#D4AA7D] text-[#D4AA7D] hover:bg-[#D4AA7D] hover:text-black">
+            <Button
+              onClick={() => navigate("/tutorial")}
+              className="w-full sm:w-auto bg-transparent border-2 border-[#D4AA7D] text-[#D4AA7D] hover:bg-[#D4AA7D] hover:text-black"
+            >
               Learn How It Works
             </Button>
             <Button className="w-full sm:w-auto bg-white/20 dark:bg-white/10 text-black dark:text-white hover:bg-white/30 dark:hover:bg-white/20">
