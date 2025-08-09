@@ -99,7 +99,7 @@ const GamePage = () => {
               </div>
             </div>
           </div>
-          <div className="w-full mx-auto max-w-[900px] p-3 md:p-4 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 shadow-lg">
+          <div className="w-full mx-auto max-w-[900px] p-3 md:p-4 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
             <div
               className={`grid ${
                 boardSize == 36 ? "grid-cols-6" : "grid-cols-8"
