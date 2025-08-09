@@ -3,7 +3,7 @@ import { User } from "lucide-react";
 import { useState } from "react";
 
 const GamePage = () => {
-  const [boardSize, setBoardSize] = useState<number>(32); // Default is 6x6
+  const [boardSize, setBoardSize] = useState<number>(36); // Default is 6x6
   return (
     <div className="px-4 py-8 md:py-12">
       <div className="flex flex-col md:flex-row gap-6">
@@ -73,9 +73,9 @@ const GamePage = () => {
                   Board
                 </span>
                 <button
-                  onClick={() => setBoardSize(32)}
+                  onClick={() => setBoardSize(36)}
                   className={`text-sm font-semibold px-2 py-1 rounded-lg transition cursor-pointer ${
-                    boardSize == 32
+                    boardSize == 36
                       ? "bg-[#D4AA7D]"
                       : "bg-transparent hover:bg-white/10"
                   } text-black`}
@@ -102,7 +102,7 @@ const GamePage = () => {
           <div className="w-full mx-auto max-w-[900px] p-3 md:p-4 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 shadow-lg">
             <div
               className={`grid ${
-                boardSize == 32 ? "grid-cols-6" : "grid-cols-8"
+                boardSize == 36 ? "grid-cols-6" : "grid-cols-8"
               } gap-1 md:gap-2`}
             >
               {[...Array(boardSize)].map((_, index) => (
