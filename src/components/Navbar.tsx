@@ -5,6 +5,7 @@ import Button from "./UI/Button";
 import NavLink from "./UI/NavLink";
 
 const Navbar = () => {
+  const [walletIsConnected, setWalletIsConnected] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(() => {
     const storedTheme = localStorage.getItem("theme");
     return storedTheme ? storedTheme === "dark" : true; // default to dark
@@ -74,13 +75,24 @@ const Navbar = () => {
               <Moon className="w-5 h-5 text-[#D4AA7D]" />
             )}
           </Button>
-          <Button
-            onClick={() => {}}
-            className="gap-2 bg-[#D4AA7D] hover:bg-[#EFD09E] text-black"
-          >
-            <Wallet className="w-4 h-4" />
-            Connect
-          </Button>
+          {walletIsConnected ? (
+            <Button
+              onClick={() => setWalletIsConnected(!walletIsConnected)}
+              className="gap-2 bg-[#D4AA7D] hover:bg-[#EFD09E] text-black"
+            >
+              <Wallet className="w-4 h-4" />
+              Connect
+            </Button>
+          ) : (
+            <Button
+              onClick={() => setWalletIsConnected(!walletIsConnected)}
+              className="gap-2 bg-[#D4AA7D] hover:bg-[#EFD09E] text-black"
+            >
+              <Wallet className="w-4 h-4" />
+              <span className="hidden sm:inline">0x1234...5678</span>
+              <span className="sm:hidden">Connected</span>
+            </Button>
+          )}
         </div>
       </div>
     </header>
