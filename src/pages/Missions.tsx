@@ -1,19 +1,19 @@
 import Navbar from "../components/Navbar";
-import Dashboard from "../components/Dashboard";
 import Footer from "../components/Footer";
+import MissionsPage from "../components/MissionsPage";
 
-const Home = () => {
+const Missions = () => {
   return (
     <div className="min-h-screen flex flex-col text-gray-900 dark:text-gray-100 bg-gray-200 dark:bg-[#272727]">
       <Navbar />
       <div className="flex-grow">
         <main className="container mx-auto">
-          <Dashboard />
+          <MissionsPage />
         </main>
       </div>
       <Footer />
     </div>
   );
-};
-
-export default Home;
+}
+ 
+export default Missions;
