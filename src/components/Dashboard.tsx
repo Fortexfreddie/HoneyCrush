@@ -7,6 +7,8 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { useRef } from "react";
+import Button from "./UI/Button";
+import { useNavigate } from "react-router-dom";
 import neonbee from "../assets/neon-bee-avatar-rare.png";
 
 const avatars = [
@@ -30,6 +32,7 @@ const avatars = [
 ];
 
 const Dashboard = () => {
+  const navigate = useNavigate();
   const ref = useRef<HTMLDivElement | null>(null);
   const scrollBy = (dx: number) => {
     if (!ref.current) return;
@@ -51,16 +54,16 @@ const Dashboard = () => {
             and collect on-chain rewards.
           </p>
           <div className="mt-6 flex flex-col sm:flex-row gap-3">
-            <button className="w-full sm:w-auto font-bold py-2 px-4 rounded-xl cursor-pointer shadow-lg transition inline-flex items-center justify-center bg-[#D4AA7D] hover:bg-[#EFD09E] text-black">
+            <Button className="w-full sm:w-auto bg-[#D4AA7D] hover:bg-[#EFD09E] text-black">
               Start Playing
-            </button>
-            <button className="w-full sm:w-auto font-bold py-2 px-4 rounded-xl cursor-pointer shadow-lg transition inline-flex items-center justify-center bg-transparent border-2 border-[#D4AA7D] text-[#D4AA7D] hover:bg-[#D4AA7D] hover:text-black">
+            </Button>
+            <Button className="w-full sm:w-auto bg-transparent border-2 border-[#D4AA7D] text-[#D4AA7D] hover:bg-[#D4AA7D] hover:text-black">
               Learn How It Works
-            </button>
-            <button className="w-full sm:w-auto font-bold py-2 px-4 rounded-xl cursor-pointer shadow-lg transition inline-flex items-center justify-center bg-white/20 dark:bg-white/10 text-black dark:text-white hover:bg-white/30 dark:hover:bg-white/20">
+            </Button>
+            <Button className="w-full sm:w-auto bg-white/20 dark:bg-white/10 text-black dark:text-white hover:bg-white/30 dark:hover:bg-white/20">
               <Wallet className="w-4 h-4 mr-2" />
               Connect Wallet
-            </button>
+            </Button>
           </div>
           <div className="mt-4 flex items-center text-sm text-gray-700/80 dark:text-gray-300/80">
             <Info className="w-4 h-4 mr-2" />
@@ -127,7 +130,10 @@ const Dashboard = () => {
             Swap adjacent tiles to form matches of 3+ in a row. Clear combos,
             chain reactions, and earn points against the clock.
           </p>
-          <span className="cursor-pointer mt-4 inline-flex items-center text-[#D4AA7D] hover:text-[#EFD09E] transition">
+          <span
+            onClick={() => navigate("/game")}
+            className="cursor-pointer mt-4 inline-flex items-center text-[#D4AA7D] hover:text-[#EFD09E] transition"
+          >
             Play the demo
             <ChevronRight className="w-4 h-4 ml-1" />
           </span>
@@ -142,7 +148,10 @@ const Dashboard = () => {
             Power up and collect NFT characters. Complete challenges to unlock
             traits and rare skins that boost your gameplay.
           </p>
-          <span className="cursor-pointer mt-4 inline-flex items-center text-[#D4AA7D] hover:text-[#EFD09E] transition">
+          <span
+            onClick={() => navigate("/missions")}
+            className="cursor-pointer mt-4 inline-flex items-center text-[#D4AA7D] hover:text-[#EFD09E] transition"
+          >
             See rewards
             <ChevronRight className="w-4 h-4 ml-1" />
           </span>
@@ -157,7 +166,10 @@ const Dashboard = () => {
             Take on daily and seasonal missions via Honeycomb Protocol to earn
             Nectar, XP, and token rewards.
           </p>
-          <span className="cursor-pointer mt-4 inline-flex items-center text-[#D4AA7D] hover:text-[#EFD09E] transition">
+          <span
+            onClick={() => navigate("/missions")}
+            className="cursor-pointer mt-4 inline-flex items-center text-[#D4AA7D] hover:text-[#EFD09E] transition"
+          >
             Explore missions
             <ChevronRight className="w-4 h-4 ml-1" />
           </span>

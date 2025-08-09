@@ -3,6 +3,7 @@ import Home from "./pages/Home";
 import Dashboard from "./components/Dashboard";
 import Missions from "./pages/Missions";
 import NotFoundPage from "./pages/404";
+import Game from "./pages/Game";
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
           <Route index path="/dashboard" element={<Dashboard />} />
         </Route>
         <Route path="/missions" element={<Missions />} />
+        <Route path="/game" element={<Game />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </>
