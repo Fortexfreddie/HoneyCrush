@@ -6,35 +6,67 @@ import { useGame } from "../context/GameContext";
 
 const GamePage = () => {
   const colors = [
-  "#FF5711", // orange-red
-  "#33FF57", // lime green
-  "#3357FF", // blue
-  "#F1C40F", // yellow
-  "#9B59B6", // purple
-  "#1ABC9C", // teal
-  "#654321", // brown
-  "#E74C3C", // red
-];
-const {timer, setTimer, score} = useGame()
+    "#FF5711", // orange-red
+    "#33FF57", // lime green
+    "#3357FF", // blue
+    "#F1C40F", // yellow
+    "#9B59B6", // purple
+    "#1ABC9C", // teal
+    "#654321", // brown
+    "#E74C3C", // red
+  ];
+  const { timer, setTimer, score, setScore } = useGame();
   const [boardSize, setBoardSize] = useState<number>(36);
+  const getRandomColor = (colors: string[]) => {
+    return colors[Math.floor(Math.random() * colors.length)];
+  };
   const [board, setBoard] = useState<string[]>(
-    [...Array(36)].map(() => colors[Math.floor(Math.random() * colors.length)])
+    [...Array(36)].map(() => getRandomColor(colors))
   );
   const [draggedTile, setDraggedTile] = useState<number | null>(null);
-  const width = boardSize === 36 ? 6 : 4
-  const handleDrop = (targetIndex: number) => {
-    if (draggedTile === null || draggedTile === targetIndex) return;
+  const width = boardSize === 36 ? 6 : 4;
+  // Tiles currently flagged as matched (for destroy animation)
+  const [matched, setMatched] = useState<Set<number>>(new Set());
+  // Lock user input while resolving cascades
+  const [isResolving, setIsResolving] = useState<boolean>(false);
+  // Game active flag - prevents interaction until Start is clicked
+  const [hasStarted, setHasStarted] = useState<boolean>(false);
 
-    // Swap tiles in board
-    const updatedBoard = [...board];
-    [updatedBoard[draggedTile], updatedBoard[targetIndex]] = [
-      updatedBoard[targetIndex],
-      updatedBoard[draggedTile],
+  // Small helper to wait for CSS transitions
+  const sleep = (ms: number) => new Promise((res) => setTimeout(res, ms));
+
+  // Swap handler with adjacency validation and match resolution
+  const handleDrop = async (targetIndex: number) => {
+    // Ignore interactions while resolving animations/cascades or before game start or after time up
+    if (isResolving || !hasStarted || timer <= 0) return;
+    if (draggedTile === null || draggedTile === targetIndex) return;
+    // Only allow adjacent swaps
+    if (!isAdjacent(draggedTile, targetIndex, width)) {
+      setDraggedTile(null);
+      return;
+    }
+
+    // Try the swap in a copy
+    const swapped = [...board];
+    [swapped[draggedTile], swapped[targetIndex]] = [
+      swapped[targetIndex],
+      swapped[draggedTile],
     ];
 
-    setBoard(updatedBoard);
-    checkMatches(updatedBoard, width)
+    // Check if swap creates any match
+    const m = checkMatches(swapped, width);
+    if (m.size === 0) {
+      // Revert: do not commit a swap that doesn't create matches
+      setDraggedTile(null);
+      return;
+    }
+
+    // Commit the swap visually
+    setBoard(swapped);
     setDraggedTile(null);
+
+    // Resolve matches/cascades with animation and scoring
+    await resolveBoard(swapped, width);
   };
 
   //for checking color match
@@ -87,22 +119,186 @@ const {timer, setTimer, score} = useGame()
         r += run; // skip past this run
       }
     }
-
     return matched;
-    alert('there is a match')
   };
 
-  const startTheGame = () => {
-    const startTimer = setInterval(() => {
-      setTimer(prev => {
-        if(prev <= 1){
-          clearInterval(startTimer)
-          return 0
+  //check if they are adjacent
+  const isAdjacent = (a: number, b: number, width: number): boolean => {
+    // Same row → difference of 1 but not wrapping
+    if (
+      Math.floor(a / width) === Math.floor(b / width) &&
+      Math.abs(a - b) === 1
+    ) {
+      return true;
+    }
+
+    // Same column → difference of exactly `width`
+    if (Math.abs(a - b) === width) {
+      return true;
+    }
+
+    return false;
+  };
+
+  // Clear matched tiles by setting them to null and return cleared count
+  const clearMatches = (
+    grid: string[],
+    matches: Set<number>
+  ): { board: (string | null)[]; cleared: number } => {
+    const next: (string | null)[] = [...grid];
+    matches.forEach((idx) => {
+      next[idx] = null;
+    });
+    return { board: next, cleared: matches.size };
+  };
+
+  // Apply gravity: for each column, let non-null tiles fall down
+  const applyGravity = (
+    grid: (string | null)[],
+    width: number
+  ): (string | null)[] => {
+    const height = Math.floor(grid.length / width);
+    const next = [...grid];
+
+    for (let c = 0; c < width; c++) {
+      // Collect non-null tiles from bottom to top
+      const stack: string[] = [];
+      for (let r = height - 1; r >= 0; r--) {
+        const idx = r * width + c;
+        const val = next[idx];
+        if (val) stack.push(val);
+      }
+      // Write back bottom-up
+      let r = height - 1;
+      for (const val of stack) {
+        next[r * width + c] = val;
+        r--;
+      }
+      // Fill remaining cells above with null
+      for (; r >= 0; r--) {
+        next[r * width + c] = null;
+      }
+    }
+    return next;
+  };
+
+  // Refill any null tiles with new random colors
+  const refill = (grid: (string | null)[], colors: string[]): string[] => {
+    return grid.map((v) => (v ? v : getRandomColor(colors)));
+  };
+
+  // Check if any single adjacent swap can produce a match
+  const hasPossibleMoves = (grid: string[], width: number): boolean => {
+    const size = grid.length;
+    const height = Math.floor(size / width);
+
+    for (let i = 0; i < size; i++) {
+      const r = Math.floor(i / width);
+      const c = i % width;
+
+      // Try swap to the right
+      if (c + 1 < width) {
+        const j = i + 1;
+        if (grid[j] !== grid[i]) {
+          const swapped = [...grid];
+          [swapped[i], swapped[j]] = [swapped[j], swapped[i]];
+          if (checkMatches(swapped, width).size > 0) return true;
         }
-        return prev - 1
-      })
-    }, 1000)
-  }
+      }
+      // Try swap downward
+      if (r + 1 < height) {
+        const j = i + width;
+        if (grid[j] !== grid[i]) {
+          const swapped = [...grid];
+          [swapped[i], swapped[j]] = [swapped[j], swapped[i]];
+          if (checkMatches(swapped, width).size > 0) return true;
+        }
+      }
+    }
+    return false;
+  };
+
+  // Generate a fresh board with no immediate matches and at least one possible move
+  const generatePlayableBoard = (size: number, colors: string[]): string[] => {
+    const w = size === 36 ? 6 : 4;
+    for (let attempts = 0; attempts < 500; attempts++) {
+      const fresh = [...Array(size)].map(() => getRandomColor(colors));
+      if (checkMatches(fresh, w).size > 0) continue; // avoid immediate matches
+      if (hasPossibleMoves(fresh, w)) return fresh; // ensure at least one move
+    }
+    // Fallback (rare): return a random board; start will resolve if needed
+    return [...Array(size)].map(() => getRandomColor(colors));
+  };
+
+  // Resolve matches with animation, gravity, refills, and scoring.
+  // widthArg is passed in to avoid stale width during a board size switch.
+  const resolveBoard = async (initial: string[], widthArg?: number) => {
+    const w = widthArg ?? width;
+    setIsResolving(true);
+    let current: string[] = initial;
+
+    while (true) {
+      const matches = checkMatches(current, w);
+      if (matches.size === 0) {
+        // Clear any previous match flags and finish
+        setMatched(new Set());
+        break;
+      }
+
+      // Flag matched tiles for a brief destroy animation
+      setMatched(matches);
+      await sleep(250); // keep in sync with CSS duration
+
+      // Clear matched tiles and score them
+      const { board: clearedBoard, cleared } = clearMatches(current, matches);
+      // Update score (+1 per cleared tile) - stored in GameContext
+      setScore((prev: number) => prev + cleared);
+
+      // Apply gravity, then refill, then continue to look for cascades
+      const afterGravity = applyGravity(clearedBoard, w);
+      const refilled = refill(afterGravity, colors);
+
+      // Publish the new board state for the next loop/cascade
+      setBoard(refilled);
+      current = refilled;
+    }
+
+    // After stabilizing, if no more possible moves remain, generate a new playable board
+    if (!hasPossibleMoves(current, w)) {
+      const fresh = generatePlayableBoard(boardSize, colors);
+      setBoard(fresh);
+    }
+
+    setIsResolving(false);
+  };
+
+  // Build a new board for a given size and immediately resolve any pre-existing matches
+  const regenerateBoard = async (size: number) => {
+    const fresh = generatePlayableBoard(size, colors);
+    setBoardSize(size);
+    setBoard(fresh);
+  };
+
+  //start button function
+  const startTheGame = async () => {
+    // Activate the game; drag is now enabled (still blocked while resolving)
+    setHasStarted(true);
+
+    // Clean the initial board so no immediate matches remain and ensure future moves exist
+    await resolveBoard([...board], width);
+
+    // Start countdown timer
+    const startTimer = setInterval(() => {
+      setTimer((prev) => {
+        if (prev < 1) {
+          clearInterval(startTimer);
+          // setScore(0)
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  };
 
   return (
     <div className="px-4 py-8 md:py-12">
@@ -163,13 +359,24 @@ const {timer, setTimer, score} = useGame()
               </div>
             </div>
             <div className="mt-4 flex flex-wrap gap-3">
-              <Button onClick={() => {startTheGame()}} className="bg-[#D4AA7D] hover:bg-[#EFD09E] text-black">
+              <Button
+                onClick={() => {
+                  startTheGame();
+                }}
+                className="bg-[#D4AA7D] hover:bg-[#EFD09E] text-black active:scale-95 active:translate-y-0 transition-transform duration-150"
+              >
                 Start Game
               </Button>
               {/* <Button className="bg-[#D4AA7D] hover:bg-[#EFD09E] text-black">
                 Pause
               </Button> */}
-              <Button className="bg-transparent border-2 border-[#D4AA7D] text-[#D4AA7D] hover:bg-[#D4AA7D] hover:text-black">
+              <Button
+                className="
+                   bg-transparent border-2 border-[#D4AA7D] text-[#D4AA7D] 
+                  hover:bg-[#D4AA7D] hover:text-black
+                    active:scale-95 active:translate-y-0 transition-transform duration-150
+                    "
+              >
                 End Game
               </Button>
             </div>
@@ -214,12 +421,7 @@ const {timer, setTimer, score} = useGame()
                 </span>
                 <button
                   onClick={() => {
-                    setBoardSize(16);
-                    setBoard(
-                      [...Array(16)].map(
-                        () => colors[Math.floor(Math.random() * colors.length)]
-                      )
-                    );
+                    regenerateBoard(16);
                   }}
                   className={`text-sm font-semibold px-2 py-1 rounded-lg transition cursor-pointer ${
                     boardSize === 16
@@ -231,12 +433,7 @@ const {timer, setTimer, score} = useGame()
                 </button>
                 <button
                   onClick={() => {
-                    setBoardSize(36);
-                    setBoard(
-                      [...Array(36)].map(
-                        () => colors[Math.floor(Math.random() * colors.length)]
-                      )
-                    );
+                    regenerateBoard(36);
                   }}
                   className={`text-sm font-semibold px-2 py-1 rounded-lg transition cursor-pointer ${
                     boardSize === 36
@@ -264,7 +461,7 @@ const {timer, setTimer, score} = useGame()
               {board.map((tileColor, index) => (
                 <div
                   key={index}
-                  draggable
+                  draggable={hasStarted && !isResolving && timer > 0}
                   onDragStart={() => setDraggedTile(index)}
                   onDragOver={(e) => e.preventDefault()}
                   onDrop={() => handleDrop(index)}
@@ -273,7 +470,9 @@ const {timer, setTimer, score} = useGame()
                     boxShadow:
                       "inset 2px 2px 5px rgba(255, 255, 255, 0.2), inset -2px -2px 5px rgba(0, 0, 0, 0.5), 2px 2px 6px rgba(0, 0, 0, 0.7), 5px 5px 0px rgba(0, 0, 0, 0.3)",
                   }}
-                  className="w-full aspect-square rounded-xl md:rounded-2xl flex items-center justify-center text-lg font-bold text-gray-900 dark:text-gray-100 hover:scale-105 hover:ring-2 transition-transform duration-200 cursor-pointer"
+                  className={`w-full aspect-square rounded-xl md:rounded-2xl flex items-center justify-center text-lg font-bold text-gray-900 dark:text-gray-100 hover:scale-105 hover:ring-2 transition-all duration-200 cursor-pointer ${
+                    matched.has(index) ? "opacity-0 scale-75 blur-[1px]" : ""
+                  } ${isResolving ? "pointer-events-none" : ""}`}
                 >
                   {/* {tileColor} */}
                 </div>
