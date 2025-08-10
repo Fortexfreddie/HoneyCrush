@@ -1,6 +1,6 @@
 import Button from "./UI/Button";
 import { User } from "lucide-react";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import NeonBee from "../assets/neon-bee-avatar-rare.png";
 import { useGame } from "../context/GameContext";
 
@@ -15,6 +15,7 @@ const GamePage = () => {
     "#654321", // brown
     "#E74C3C", // red
   ];
+  const timerRef = useRef<number | null>(null)
   const { timer, setTimer, score, setScore } = useGame();
   const [boardSize, setBoardSize] = useState<number>(36);
   const getRandomColor = (colors: string[]) => {
@@ -279,6 +280,12 @@ const GamePage = () => {
     setBoard(fresh);
   };
 
+  const endTheGame = async () => {
+    if(timerRef.current) clearInterval(timerRef.current)
+    setHasStarted(false);
+    setTimer(20)
+  }
+
   //start button function
   const startTheGame = async () => {
     // Activate the game; drag is now enabled (still blocked while resolving)
@@ -288,10 +295,10 @@ const GamePage = () => {
     await resolveBoard([...board], width);
 
     // Start countdown timer
-    const startTimer = setInterval(() => {
+    timerRef.current = window.setInterval(() => {
       setTimer((prev) => {
         if (prev < 1) {
-          clearInterval(startTimer);
+          // clearInterval(timerRef.current);
           // setScore(0)
           return 0;
         }
@@ -371,6 +378,7 @@ const GamePage = () => {
                 Pause
               </Button> */}
               <Button
+              onClick={() => {endTheGame()}}
                 className="
                    bg-transparent border-2 border-[#D4AA7D] text-[#D4AA7D] 
                   hover:bg-[#D4AA7D] hover:text-black
