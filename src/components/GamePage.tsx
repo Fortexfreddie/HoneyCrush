@@ -233,10 +233,15 @@ const GamePage = () => {
 
   // Resolve matches with animation, gravity, refills, and scoring.
   // widthArg is passed in to avoid stale width during a board size switch.
-  const resolveBoard = async (initial: string[], widthArg?: number) => {
-    const w = widthArg ?? width;
-    setIsResolving(true);
-    let current: string[] = initial;
+  const resolveBoard = async (
+  initial: string[],
+  widthArg?: number,
+  options?: { awardScore?: boolean }
+  ) => {
+  const w = widthArg ?? width;
+  const awardScore = options?.awardScore !== false;
+  setIsResolving(true);
+  let current: string[] = initial;
 
     while (true) {
       const matches = checkMatches(current, w);
@@ -253,7 +258,9 @@ const GamePage = () => {
       // Clear matched tiles and score them
       const { board: clearedBoard, cleared } = clearMatches(current, matches);
       // Update score (+1 per cleared tile) - stored in GameContext
+      if (awardScore) {
       setScore((prev: number) => prev + cleared);
+      }
 
       // Apply gravity, then refill, then continue to look for cascades
       const afterGravity = applyGravity(clearedBoard, w);
@@ -288,24 +295,37 @@ const GamePage = () => {
 
   //start button function
   const startTheGame = async () => {
-    // Activate the game; drag is now enabled (still blocked while resolving)
+    // Stop any running timer to avoid multiple intervals
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+
+    // Reset state for a fresh run
+    setScore(0);
+    setTimer(20);
+    setMatched(new Set());
     setHasStarted(true);
 
-    // Clean the initial board so no immediate matches remain and ensure future moves exist
-    await resolveBoard([...board], width);
+    // Clean the initial board so no immediate matches remain and ensure future moves exist,
+    // without awarding points for this cleanup
+    await resolveBoard([...board], width, { awardScore: false });
 
     // Start countdown timer
     timerRef.current = window.setInterval(() => {
       setTimer((prev) => {
-        if (prev < 1) {
-          // clearInterval(timerRef.current);
-          // setScore(0)
+        if (prev <= 1) {
+          if (timerRef.current) {
+            clearInterval(timerRef.current);
+            timerRef.current = null;
+          }
+          // lock the board when time is up
+          setHasStarted(false);
           return 0;
         }
         return prev - 1;
       });
     }, 1000);
-    setScore(0)
   };
 
   return (
