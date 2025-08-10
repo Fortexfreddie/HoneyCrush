@@ -305,6 +305,7 @@ const GamePage = () => {
         return prev - 1;
       });
     }, 1000);
+    setScore(0)
   };
 
   return (
