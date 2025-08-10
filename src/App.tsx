@@ -7,6 +7,7 @@ import Game from "./pages/Game";
 import Tutorial from "./pages/Tutorial";
 import Admin from "./pages/Admin";
 import AdminDashboard from "./components/Admin/AdminDashboard";
+import Users from "./components/Admin/Users";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
         <Route path="/tutorial" element={<Tutorial />} />
         <Route path="/admin" element={<Admin />}>
           <Route index element={<AdminDashboard />} />
+          <Route path="/admin/users" element={<Users />} />
         </Route>
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
