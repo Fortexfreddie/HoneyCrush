@@ -1,27 +1,86 @@
 import Button from "./UI/Button";
 import { User } from "lucide-react";
 import { useState } from "react";
+import NeonBee from "../assets/neon-bee-avatar-rare.png";
 
 const GamePage = () => {
+  const colors = ["#FF6B6B", "#FFD93D", "#6BCB77", "#4D96FF", "#A66DD4"];
   const [boardSize, setBoardSize] = useState<number>(36); // Default is 6x6
+  const [board, setBoard] = useState<string[]>(
+    [...Array(36)].map(() => colors[Math.floor(Math.random() * colors.length)])
+  );
+  const [draggedTile, setDraggedTile] = useState<number | null>(null);
+
+  const handleDrop = (targetIndex: number) => {
+    if (draggedTile === null || draggedTile === targetIndex) return;
+
+    // Swap tiles in board
+    const updatedBoard = [...board];
+    [updatedBoard[draggedTile], updatedBoard[targetIndex]] = [
+      updatedBoard[targetIndex],
+      updatedBoard[draggedTile],
+    ];
+
+    setBoard(updatedBoard);
+    setDraggedTile(null);
+  };
+
   return (
     <div className="px-4 py-8 md:py-12">
       <div className="flex flex-col md:flex-row gap-6">
-        <div className="flex flex-col gap-4 order-2 lg:order-1">
-          <div className="p-5 rounded-2xl bg-white/45 dark:bg-black/35 border border-white/35 dark:border-white/10 backdrop-blur-md shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
+        {/* Left Panel */}
+        <div className="md:w-4/6 flex flex-col gap-4 order-2 lg:order-1">
+          <div className="p-5 rounded-2xl order-2 lg:order-2 bg-white/45 dark:bg-black/35 border border-white/35 dark:border-white/10 backdrop-blur-md shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
+            <div className="flex items-center gap-4">
+              <div className="w-16 h-16 rounded-xl backdrop-blur-md border border-white/20 overflow-hidden">
+                <img
+                  src={NeonBee}
+                  alt="User Avatar"
+                  className="w-full h-full object-cover object-center"
+                />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-xl font-bold">Cyber Bee v1</span>
+                <span>Level 2</span>
+              </div>
+            </div>
+            <div className="mt-4 grid grid-cols-3 gap-3">
+              <div className="p-3 flex flex-col text-center rounded-xl bg-white/5 backdrop-blur-sm border border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
+                <span className="text-xs uppercase opacity-80">Nectar</span>
+                <span className="text-2xl font-extrabold dark:text-[#D4AA7D]">
+                  120
+                </span>
+              </div>
+              <div className="p-3 flex flex-col text-center rounded-xl bg-white/5 backdrop-blur-sm border border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
+                <span className="text-xs uppercase opacity-80">Xp</span>
+                <span className="text-2xl font-extrabold dark:text-[#EFD09E]">
+                  320
+                </span>
+              </div>
+              <div className="p-3 flex flex-col text-center rounded-xl bg-white/5 backdrop-blur-sm border border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
+                <span className="text-xs uppercase opacity-80">Tokens</span>
+                <span className="text-2xl font-extrabold dark:text-[#9EEFD0]">
+                  5
+                </span>
+              </div>
+            </div>
+          </div>
+          <div className="p-5 rounded-2xl order-1 lg:order-2 bg-white/45 dark:bg-black/35 border border-white/35 dark:border-white/10 backdrop-blur-md shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
             <h2 className="text-xl font-bold">Stats</h2>
             <div className="mt-4 grid grid-cols-3 gap-3">
-              <div className="p-3 flex flex-col text-center rounded-xl bg-white/5 backdrop-blur-sm border border-white/10">
+              <div className="p-3 flex flex-col text-center rounded-xl bg-white/5 backdrop-blur-sm border border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
                 <span className="text-xs uppercase opacity-80">Score</span>
                 <span className="text-2xl font-extrabold">10</span>
               </div>
-              <div className="p-3 flex flex-col text-center rounded-xl bg-white/5 backdrop-blur-sm border border-white/10">
+              <div className="p-3 flex flex-col text-center rounded-xl bg-white/5 backdrop-blur-sm border border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
                 <span className="text-xs uppercase opacity-80">Time</span>
                 <span className="text-2xl font-extrabold">20s</span>
               </div>
-              <div className="p-3 flex flex-col text-center rounded-xl bg-white/5 backdrop-blur-sm border border-white/10">
+              <div className="p-3 flex flex-col text-center rounded-xl bg-white/5 backdrop-blur-sm border border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
                 <span className="text-xs uppercase opacity-80">Board</span>
-                <span className="text-2xl font-extrabold">6x6</span>
+                <span className="text-2xl font-extrabold">
+                  {boardSize === 36 ? "6x6" : "4x4"}
+                </span>
               </div>
             </div>
             <div className="mt-4 flex flex-wrap gap-3">
@@ -36,7 +95,7 @@ const GamePage = () => {
               </Button>
             </div>
           </div>
-          <div className="p-5 rounded-2xl bg-white/45 dark:bg-black/35 border border-white/35 dark:border-white/10 backdrop-blur-md shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
+          <div className="p-5 rounded-2xl order-3 lg:order-3 bg-white/45 dark:bg-black/35 border border-white/35 dark:border-white/10 backdrop-blur-md shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
             <h3 className="text-lg font-bold">Power-Ups</h3>
             <ul className="mt-3 space-y-2 text-sm text-gray-800/90 dark:text-gray-200/90">
               <li>- Row Blaster (clear a row)</li>
@@ -45,78 +104,104 @@ const GamePage = () => {
             </ul>
           </div>
         </div>
+
+        {/* Right Panel */}
         <div className="flex-1 flex flex-col gap-4 order-1 lg:order-2">
           <div className="p-5 flex flex-wrap items-center justify-between gap-3 bg-white/45 dark:bg-black/35 backdrop-blur-md rounded-2xl border border-white/35 dark:border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
-            <div className="flex items-center gap-3">
+            {/* <div className="flex items-center gap-3">
               <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/40 dark:bg-black/30 backdrop-blur-md border border-white/20">
                 <span className="text-xs uppercase tracking-widest opacity-70">
                   Nectar
                 </span>
-                <span className="font-extrabold text-[#D4AA7D]">150</span>
+                <span className="font-extrabold dark:text-[#D4AA7D]">150</span>
               </div>
               <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/40 dark:bg-black/30 backdrop-blur-md border border-white/20">
                 <span className="text-xs uppercase tracking-widest opacity-70">
                   XP
                 </span>
-                <span className="font-extrabold text-[#EFD09E]">1500</span>
+                <span className="font-extrabold dark:text-[#EFD09E]">1500</span>
               </div>
               <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/40 dark:bg-black/30 backdrop-blur-md border border-white/20">
                 <span className="text-xs uppercase tracking-widest opacity-70">
                   Tokens
                 </span>
-                <span className="font-extrabold text-[#9EEFD0]">3</span>
+                <span className="font-extrabold dark:text-[#9EEFD0]">3</span>
               </div>
-            </div>
-            <div className="flex items-center gap-3">
+            </div> */}
+            <div className="flex items-center gap-3 max-w-xl mx-auto">
               <div className="flex items-center gap-2 rounded-xl px-3 py-2 bg-black/5 dark:bg-white/5">
                 <span className="text-xs uppercase tracking-wider opacity-80">
                   Board
                 </span>
                 <button
-                  onClick={() => setBoardSize(36)}
+                  onClick={() => {
+                    setBoardSize(16);
+                    setBoard(
+                      [...Array(16)].map(
+                        () => colors[Math.floor(Math.random() * colors.length)]
+                      )
+                    );
+                  }}
                   className={`text-sm font-semibold px-2 py-1 rounded-lg transition cursor-pointer ${
-                    boardSize == 36
+                    boardSize === 16
                       ? "bg-[#D4AA7D]"
                       : "bg-transparent hover:bg-white/10"
-                  } text-black`}
+                  } text-black dark:text-white`}
+                >
+                  4x4
+                </button>
+                <button
+                  onClick={() => {
+                    setBoardSize(36);
+                    setBoard(
+                      [...Array(36)].map(
+                        () => colors[Math.floor(Math.random() * colors.length)]
+                      )
+                    );
+                  }}
+                  className={`text-sm font-semibold px-2 py-1 rounded-lg transition cursor-pointer ${
+                    boardSize === 36
+                      ? "bg-[#D4AA7D]"
+                      : "bg-transparent hover:bg-white/10"
+                  } text-black dark:text-white`}
                 >
                   6x6
                 </button>
-                <button
-                  onClick={() => setBoardSize(64)}
-                  className={`text-sm font-semibold px-2 py-1 rounded-lg transition cursor-pointer ${
-                    boardSize == 64
-                      ? "bg-[#D4AA7D]"
-                      : "bg-transparent hover:bg-white/10"
-                  } text-black`}
-                >
-                  8x8
-                </button>
               </div>
-              <div className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10">
+              <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
                 <User className="w-4 h-4 text-[#D4AA7D]" />
                 <span className="text-sm">NFT: Cyber Bee v1</span>
               </div>
             </div>
           </div>
+
+          {/* Game Board */}
           <div className="w-full mx-auto max-w-[900px] p-3 md:p-4 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
             <div
               className={`grid ${
-                boardSize == 36 ? "grid-cols-6" : "grid-cols-8"
+                boardSize === 36 ? "grid-cols-6" : "grid-cols-4"
               } gap-1 md:gap-2`}
             >
-              {[...Array(boardSize)].map((_, index) => (
+              {board.map((tileColor, index) => (
                 <div
                   key={index}
-                  className="w-full aspect-square bg-gray-200 dark:bg-gray-800 rounded-xl md:rounded-2xl shadow-lg flex items-center justify-center text-lg font-bold text-gray-900 dark:text-gray-100 hover:scale-105 hover:ring-2 ring-[#D4AA7D] transition-transform duration-200 cursor-pointer"
+                  draggable
+                  onDragStart={() => setDraggedTile(index)}
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={() => handleDrop(index)}
+                  style={{
+                    background: tileColor,
+                    boxShadow:
+                      "inset 2px 2px 5px rgba(255, 255, 255, 0.2), inset -2px -2px 5px rgba(0, 0, 0, 0.5), 2px 2px 6px rgba(0, 0, 0, 0.7), 5px 5px 0px rgba(0, 0, 0, 0.3)",
+                  }}
+                  className="w-full aspect-square rounded-xl md:rounded-2xl flex items-center justify-center text-lg font-bold text-gray-900 dark:text-gray-100 hover:scale-105 hover:ring-2 transition-transform duration-200 cursor-pointer"
                 >
-                  {index + 1}
+                  {/* {tileColor} */}
                 </div>
               ))}
             </div>
             <p className="mt-3 text-xs opacity-70">
-              Tip: Tap/click one tile, then an adjacent tile to swap. Create
-              matches of 3+.
+              Tip: Drag a tile onto another to swap them. Create matches of 3+.
             </p>
           </div>
         </div>
@@ -124,5 +209,5 @@ const GamePage = () => {
     </div>
   );
 };
- 
+
 export default GamePage;
