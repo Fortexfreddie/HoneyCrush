@@ -2,15 +2,26 @@ import Button from "./UI/Button";
 import { User } from "lucide-react";
 import { useState } from "react";
 import NeonBee from "../assets/neon-bee-avatar-rare.png";
+import { useGame } from "../context/GameContext";
 
 const GamePage = () => {
-  const colors = ["#FF6B6B", "#FFD93D", "#6BCB77", "#4D96FF", "#A66DD4"];
-  const [boardSize, setBoardSize] = useState<number>(36); // Default is 6x6
+  const colors = [
+  "#FF5711", // orange-red
+  "#33FF57", // lime green
+  "#3357FF", // blue
+  "#F1C40F", // yellow
+  "#9B59B6", // purple
+  "#1ABC9C", // teal
+  "#654321", // brown
+  "#E74C3C", // red
+];
+const {timer, setTimer, score} = useGame()
+  const [boardSize, setBoardSize] = useState<number>(36);
   const [board, setBoard] = useState<string[]>(
     [...Array(36)].map(() => colors[Math.floor(Math.random() * colors.length)])
   );
   const [draggedTile, setDraggedTile] = useState<number | null>(null);
-
+  const width = boardSize === 36 ? 6 : 4
   const handleDrop = (targetIndex: number) => {
     if (draggedTile === null || draggedTile === targetIndex) return;
 
@@ -22,15 +33,83 @@ const GamePage = () => {
     ];
 
     setBoard(updatedBoard);
+    checkMatches(updatedBoard, width)
     setDraggedTile(null);
   };
+
+  //for checking color match
+  const checkMatches = (board: string[], width: number): Set<number> => {
+    const matched = new Set<number>();
+    const height = Math.floor(board.length / width);
+
+    // Horizontal scan: iterate each row and find runs of length >= 3
+    for (let r = 0; r < height; r++) {
+      let c = 0;
+      while (c <= width - 3) {
+        const start = r * width + c;
+        const color = board[start];
+        if (!color) {
+          c++;
+          continue;
+        }
+        let run = 1;
+        while (c + run < width && board[r * width + (c + run)] === color) {
+          run++;
+        }
+        if (run >= 3) {
+          for (let k = 0; k < run; k++) {
+            matched.add(r * width + c + k);
+          }
+        }
+        c += run; // skip past this run
+      }
+    }
+
+    // Vertical scan: iterate each column and find runs of length >= 3
+    for (let c = 0; c < width; c++) {
+      let r = 0;
+      while (r <= height - 3) {
+        const start = r * width + c;
+        const color = board[start];
+        if (!color) {
+          r++;
+          continue;
+        }
+        let run = 1;
+        while (r + run < height && board[(r + run) * width + c] === color) {
+          run++;
+        }
+        if (run >= 3) {
+          for (let k = 0; k < run; k++) {
+            matched.add((r + k) * width + c);
+          }
+        }
+        r += run; // skip past this run
+      }
+    }
+
+    return matched;
+    alert('there is a match')
+  };
+
+  const startTheGame = () => {
+    const startTimer = setInterval(() => {
+      setTimer(prev => {
+        if(prev <= 1){
+          clearInterval(startTimer)
+          return 0
+        }
+        return prev - 1
+      })
+    }, 1000)
+  }
 
   return (
     <div className="px-4 py-8 md:py-12">
       <div className="flex flex-col md:flex-row gap-6">
         {/* Left Panel */}
-        <div className="md:w-4/6 flex flex-col gap-4 order-2 lg:order-1">
-          <div className="p-5 rounded-2xl order-2 lg:order-2 bg-white/45 dark:bg-black/35 border border-white/35 dark:border-white/10 backdrop-blur-md shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
+        <div className="md:w-4/6 flex flex-col gap-4 order-1 lg:order-1">
+          <div className="p-5 rounded-2xl order-1 lg:order-2 bg-white/45 dark:bg-black/35 border border-white/35 dark:border-white/10 backdrop-blur-md shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
             <div className="flex items-center gap-4">
               <div className="w-16 h-16 rounded-xl backdrop-blur-md border border-white/20 overflow-hidden">
                 <img
@@ -70,11 +149,11 @@ const GamePage = () => {
             <div className="mt-4 grid grid-cols-3 gap-3">
               <div className="p-3 flex flex-col text-center rounded-xl bg-white/5 backdrop-blur-sm border border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
                 <span className="text-xs uppercase opacity-80">Score</span>
-                <span className="text-2xl font-extrabold">10</span>
+                <span className="text-2xl font-extrabold">{score}</span>
               </div>
               <div className="p-3 flex flex-col text-center rounded-xl bg-white/5 backdrop-blur-sm border border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
                 <span className="text-xs uppercase opacity-80">Time</span>
-                <span className="text-2xl font-extrabold">20s</span>
+                <span className="text-2xl font-extrabold">{timer}s</span>
               </div>
               <div className="p-3 flex flex-col text-center rounded-xl bg-white/5 backdrop-blur-sm border border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
                 <span className="text-xs uppercase opacity-80">Board</span>
@@ -84,12 +163,12 @@ const GamePage = () => {
               </div>
             </div>
             <div className="mt-4 flex flex-wrap gap-3">
-              <Button className="bg-[#D4AA7D] hover:bg-[#EFD09E] text-black">
+              <Button onClick={() => {startTheGame()}} className="bg-[#D4AA7D] hover:bg-[#EFD09E] text-black">
                 Start Game
               </Button>
-              <Button className="bg-[#D4AA7D] hover:bg-[#EFD09E] text-black">
+              {/* <Button className="bg-[#D4AA7D] hover:bg-[#EFD09E] text-black">
                 Pause
-              </Button>
+              </Button> */}
               <Button className="bg-transparent border-2 border-[#D4AA7D] text-[#D4AA7D] hover:bg-[#D4AA7D] hover:text-black">
                 End Game
               </Button>
