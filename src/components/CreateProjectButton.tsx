@@ -22,8 +22,19 @@ export default function CreateProjectButton() {
           authority: wallet.publicKey.toBase58(),
           payer: wallet.publicKey.toBase58(),
           profileDataConfig: {
-            achievements: ["Puzzle Master", "Speed Solver"],
-            customDataFields: ["Games Played", "High Score"],
+            achievements: [
+              "Puzzle Master",
+              "Speed Solver",
+              "Combo King",
+              "Treasure Collector",
+              "Level Legend",
+            ],
+            customDataFields: [
+              "Games Played",
+              "High Score",
+              "Nectar Earned",
+              "Last Active",
+            ],
           },
         });
 

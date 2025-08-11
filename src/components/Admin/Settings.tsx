@@ -18,11 +18,11 @@ const Settings = () => {
                     <div className="flex items-center justify-between">
                         <span className="text-sm font-semibold">Enable Power-Ups</span>
                         <button
-                            onClick={() => setIsOn(!isOn)}
                             className={`w-12 h-7 rounded-full border border-white/20 relative transition-colors duration-300 
                             ${isOn ? "bg-[#D4AA7D]" : "bg-[#272727]"}`}
                         >
                             <span
+                                onClick={() => setIsOn(!isOn)}
                                 className={`absolute top-[1.5px] w-6 h-6 rounded-full shadow transition-all duration-300
                                 ${isOn ? "right-0.5 bg-[#272727]" : "left-0.5 bg-[#D4AA7D]"}`}
                             />
