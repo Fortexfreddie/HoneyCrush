@@ -8,10 +8,9 @@ import Tutorial from "./pages/Tutorial";
 import Admin from "./pages/Admin";
 import AdminDashboard from "./components/Admin/AdminDashboard";
 import Users from "./components/Admin/Users";
+import Settings from "./components/Admin/Settings";
 
 function App() {
- 
-
   return (
     <>
       <Routes>
@@ -24,6 +23,7 @@ function App() {
         <Route path="/admin" element={<Admin />}>
           <Route index element={<AdminDashboard />} />
           <Route path="/admin/users" element={<Users />} />
+          <Route path="/admin/settings" element={<Settings />} />
         </Route>
         <Route path="*" element={<NotFoundPage />} />
       </Routes>

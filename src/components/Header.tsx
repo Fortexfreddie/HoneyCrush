@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { Sun, Moon, Wallet, Menu, X } from "lucide-react";
+import { Sun, Moon, Menu, X } from "lucide-react";
 import Button from "./UI/Button";
 import NavLink from "./UI/NavLink";
 import { useSidebar } from "../contexts/SidebarContext";
