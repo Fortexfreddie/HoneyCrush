@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FolderPlus, Gamepad2,Wallet } from "lucide-react";
+import { FolderPlus, Gamepad2, Wallet, AlertTriangle } from "lucide-react";
 import CreateProjectButton from "../CreateProjectButton";
 import FundWalletButton from "../FundWalletButton";
 import GetHoneynetBalanceButton from "../GetHoneynetBalanceButton";
@@ -18,7 +18,10 @@ const Settings = () => {
                         <Gamepad2 className="w-4 h-4 text-[#D4AA7D]" /> Game Rules & Settings
                     </h2>
                     <div className="flex items-center justify-between">
-                        <span className="text-sm font-semibold">Maintainance Mode</span>
+                        <div className={`flex items-center gap-2 p-3 border border-[#D4AA7D]/30 dark:border-[#272727] rounded-xl ${isOn ? "bg-red-500/10 border-red-500/20" : "bg-transparent" }`}>
+                            <AlertTriangle className="w-4 h-4 text-red-500" />
+                            <span className={`text-sm font-semibold ${isOn ? "text-red-600 dark:text-red-400" : "text-base" }`}>Maintainance Mode</span>
+                        </div>
                         <button
                             className={`w-12 h-7 rounded-full relative transition-all duration-300 
                             ${isOn ? "bg-[#D4AA7D]/30 dark:bg-[#272727]" : "bg-[#272727]/30  dark:bg-black/40"}`}
@@ -26,7 +29,7 @@ const Settings = () => {
                             <span
                                 onClick={() => setIsOn(!isOn)}
                                 className={`absolute top-0.5 bg-[#272727] dark:bg-[#D4AA7D] left-0.5 w-6 h-6 rounded-full shadow-sm transition-transform duration-300
-                                ${isOn ? "translate-x-5" : "translate-x-0"}`}
+                                ${isOn ? "translate-x-5" : "translate-x-0"} cursor-pointer`}
                             />
                             {/* <span
                                 onClick={() => setIsOn(!isOn)}
