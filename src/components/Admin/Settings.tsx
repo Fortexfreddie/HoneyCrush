@@ -20,14 +20,19 @@ const Settings = () => {
                     <div className="flex items-center justify-between">
                         <span className="text-sm font-semibold">Maintainance Mode</span>
                         <button
-                            className={`w-12 h-7 rounded-full border border-white/20 relative transition-colors duration-300 
-                            ${isOn ? "bg-[#D4AA7D]" : "bg-[#272727]"}`}
+                            className={`w-12 h-7 rounded-full relative transition-all duration-300 
+                            ${isOn ? "bg-[#D4AA7D]/30 dark:bg-[#272727]" : "bg-[#272727]/30  dark:bg-black/40"}`}
                         >
                             <span
                                 onClick={() => setIsOn(!isOn)}
+                                className={`absolute top-0.5 bg-[#272727] dark:bg-[#D4AA7D] left-0.5 w-6 h-6 rounded-full shadow-sm transition-transform duration-300
+                                ${isOn ? "translate-x-5" : "translate-x-0"}`}
+                            />
+                            {/* <span
+                                onClick={() => setIsOn(!isOn)}
                                 className={`absolute top-[1.5px] w-6 h-6 rounded-full shadow transition-all duration-300
                                 ${isOn ? "right-0.5 bg-[#272727]" : "left-0.5 bg-[#D4AA7D]"}`}
-                            />
+                            /> */}
                         </button>
                     </div>
                     <div>
