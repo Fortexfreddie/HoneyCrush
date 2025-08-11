@@ -1,28 +1,39 @@
 import Button from "./UI/Button";
 import { User } from "lucide-react";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import NeonBee from "../assets/neon-bee-avatar-rare.png";
 import { useGame } from "../contexts/GameContext";
 
+const COLORS = [
+  "#FF0000", // red
+  "#00CED1", // dark turquoise
+  "#FFD700", // gold
+  "#8A2BE2", // blue-violet
+  "#0000FF", // blue
+  "#FF1493", // deep pink
+  "#00FF7F", // spring green
+  "#FF6347", // tomato
+];
+
+const getRandomColor = (colors: string[]) => {
+  return colors[Math.floor(Math.random() * colors.length)];
+};
+
 const GamePage = () => {
-  const colors = [
-    "#FF5711", // orange-red
-    "#33FF57", // lime green
-    "#3357FF", // blue
-    "#F1C40F", // yellow
-    "#9B59B6", // purple
-    "#1ABC9C", // teal
-    "#654321", // brown
-    "#E74C3C", // red
-  ];
-  const timerRef = useRef<number | null>(null)
-  const { timer, setTimer, score, setScore } = useGame();
+  // colors moved to top-level constant COLORS
+
+  const timerRef = useRef<number | null>(null);
+  const { timer, setTimer, setScore, score, total, setTotal } = useGame();
+  const currentScore = score.reduce((sum, val) => sum + val, 0);
+  const scoreRef = useRef<number>(currentScore);
+  useEffect(() => {
+    scoreRef.current = currentScore;
+  }, [currentScore]);
+
   const [boardSize, setBoardSize] = useState<number>(36);
-  const getRandomColor = (colors: string[]) => {
-    return colors[Math.floor(Math.random() * colors.length)];
-  };
+  // getRandomColor moved to top-level
   const [board, setBoard] = useState<string[]>(
-    [...Array(36)].map(() => getRandomColor(colors))
+    [...Array(36)].map(() => getRandomColor(COLORS))
   );
   const [draggedTile, setDraggedTile] = useState<number | null>(null);
   const width = boardSize === 36 ? 6 : 4;
@@ -35,6 +46,16 @@ const GamePage = () => {
 
   // Small helper to wait for CSS transitions
   const sleep = (ms: number) => new Promise((res) => setTimeout(res, ms));
+
+  // Cleanup timer interval on unmount
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+    };
+  }, []);
 
   // Swap handler with adjacency validation and match resolution
   const handleDrop = async (targetIndex: number) => {
@@ -70,6 +91,9 @@ const GamePage = () => {
     await resolveBoard(swapped, width);
   };
 
+  const handleCleared = (cleared: number) => {
+    setScore((prev) => [...prev, cleared]);
+  }
   //for checking color match
   const checkMatches = (board: string[], width: number): Set<number> => {
     const matched = new Set<number>();
@@ -234,14 +258,14 @@ const GamePage = () => {
   // Resolve matches with animation, gravity, refills, and scoring.
   // widthArg is passed in to avoid stale width during a board size switch.
   const resolveBoard = async (
-  initial: string[],
-  widthArg?: number,
-  options?: { awardScore?: boolean }
+    initial: string[],
+    widthArg?: number,
+    options?: { awardScore?: boolean }
   ) => {
-  const w = widthArg ?? width;
-  const awardScore = options?.awardScore !== false;
-  setIsResolving(true);
-  let current: string[] = initial;
+    const w = widthArg ?? width;
+    const awardScore = options?.awardScore !== false;
+    setIsResolving(true);
+    let current: string[] = initial;
 
     while (true) {
       const matches = checkMatches(current, w);
@@ -253,18 +277,18 @@ const GamePage = () => {
 
       // Flag matched tiles for a brief destroy animation
       setMatched(matches);
-      await sleep(250); // keep in sync with CSS duration
+      await sleep(200); // keep in sync with CSS duration (aligned with Tailwind duration-200)
 
       // Clear matched tiles and score them
       const { board: clearedBoard, cleared } = clearMatches(current, matches);
       // Update score (+1 per cleared tile) - stored in GameContext
       if (awardScore) {
-      setScore((prev: number) => prev + cleared);
+        handleCleared(cleared)
       }
 
       // Apply gravity, then refill, then continue to look for cascades
       const afterGravity = applyGravity(clearedBoard, w);
-      const refilled = refill(afterGravity, colors);
+      const refilled = refill(afterGravity, COLORS);
 
       // Publish the new board state for the next loop/cascade
       setBoard(refilled);
@@ -273,7 +297,7 @@ const GamePage = () => {
 
     // After stabilizing, if no more possible moves remain, generate a new playable board
     if (!hasPossibleMoves(current, w)) {
-      const fresh = generatePlayableBoard(boardSize, colors);
+      const fresh = generatePlayableBoard(boardSize, COLORS);
       setBoard(fresh);
     }
 
@@ -282,16 +306,21 @@ const GamePage = () => {
 
   // Build a new board for a given size and immediately resolve any pre-existing matches
   const regenerateBoard = async (size: number) => {
-    const fresh = generatePlayableBoard(size, colors);
+    const fresh = generatePlayableBoard(size, COLORS);
     setBoardSize(size);
     setBoard(fresh);
   };
 
   const endTheGame = async () => {
-    if(timerRef.current) clearInterval(timerRef.current)
+    if (timerRef.current) clearInterval(timerRef.current);
+    const roundScore = scoreRef.current;
+    if (roundScore > 0) {
+      setTotal((prev) => prev + roundScore);
+      setScore([]);
+    }
     setHasStarted(false);
-    setTimer(20)
-  }
+    setTimer(0);
+  };
 
   //start button function
   const startTheGame = async () => {
@@ -301,9 +330,9 @@ const GamePage = () => {
       timerRef.current = null;
     }
 
-    // Reset state for a fresh run
-    setScore(0);
-    setTimer(20);
+    // Reset state for a fresh run (do not add to total here to avoid double counting)
+    setScore([]);
+    setTimer(120);
     setMatched(new Set());
     setHasStarted(true);
 
@@ -318,6 +347,11 @@ const GamePage = () => {
           if (timerRef.current) {
             clearInterval(timerRef.current);
             timerRef.current = null;
+          }
+          const roundScore = scoreRef.current;
+          if (roundScore > 0) {
+            setTotal((prevTotal) => prevTotal + roundScore);
+            setScore([]);
           }
           // lock the board when time is up
           setHasStarted(false);
@@ -361,9 +395,11 @@ const GamePage = () => {
                 </span>
               </div>
               <div className="p-3 flex flex-col text-center rounded-xl bg-white/5 backdrop-blur-sm border border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
-                <span className="text-xs uppercase opacity-80">Tokens</span>
+                <span className="text-xs uppercase opacity-80">
+                  Total Score
+                </span>
                 <span className="text-2xl font-extrabold dark:text-[#9EEFD0]">
-                  5
+                  {total}
                 </span>
               </div>
             </div>
@@ -373,7 +409,7 @@ const GamePage = () => {
             <div className="mt-4 grid grid-cols-3 gap-3">
               <div className="p-3 flex flex-col text-center rounded-xl bg-white/5 backdrop-blur-sm border border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
                 <span className="text-xs uppercase opacity-80">Score</span>
-                <span className="text-2xl font-extrabold">{score}</span>
+                <span className="text-2xl font-extrabold">{currentScore}</span>
               </div>
               <div className="p-3 flex flex-col text-center rounded-xl bg-white/5 backdrop-blur-sm border border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
                 <span className="text-xs uppercase opacity-80">Time</span>
@@ -495,6 +531,7 @@ const GamePage = () => {
                   draggable={hasStarted && !isResolving && timer > 0}
                   onDragStart={() => setDraggedTile(index)}
                   onDragOver={(e) => e.preventDefault()}
+                  onDragEnd={() => setDraggedTile(null)}
                   onDrop={() => handleDrop(index)}
                   style={{
                     background: tileColor,
