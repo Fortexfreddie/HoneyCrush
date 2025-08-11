@@ -1,15 +1,19 @@
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { Sun, Moon, Wallet } from "lucide-react";
+import { Sun, Moon, Menu, X } from "lucide-react";
 import Button from "./UI/Button";
 import NavLink from "./UI/NavLink";
+import { useSidebar } from "../contexts/SidebarContext";
+import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
+import { useWallet } from "@solana/wallet-adapter-react";
 
-const Navbar = () => {
-  const [walletIsConnected, setWalletIsConnected] = useState(false);
+const Header = () => {
+  const wallet = useWallet();
   const [isDarkMode, setIsDarkMode] = useState(() => {
     const storedTheme = localStorage.getItem("theme");
     return storedTheme ? storedTheme === "dark" : true; // default to dark
   });
+  const { sidebarOpen, setSidebarOpen } = useSidebar();
 
   const navigate = useNavigate();
 
@@ -41,8 +45,8 @@ const Navbar = () => {
 
   return (
     <header className="container mx-auto px-4 pt-5">
-      <div className="flex items-center justify-between p-4 rounded-2xl bg-white/35 dark:bg-black/28 border border-white/30 dark:border-white/12 backdrop-blur-md shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
-        <div className="flex items-center gap-2">
+      <div className="flex items-center justify-between p-4 rounded-2xl bg-white/35 dark:bg-black/28 border border-white/30 dark:border-white/12 backdrop-blur-md shadow-[0_10px_30px_rgba(0,0,0,0.15)] relative z-50">
+        <div className="hidden lg:flex items-center gap-2">
           <div className="w-9 h-9 rounded-xl bg-[#272727] grid place-items-center shadow-[0_0_0_2px_rgba(212,170,125,0.35)_inset,0_0_16px_rgba(212,170,125,0.35),0_0_32px_rgba(122,92,255,0.25)]">
             <span className="text-[#D4AA7D] font-black">$</span>
           </div>
@@ -52,6 +56,20 @@ const Navbar = () => {
               Match • Win • Earn
             </div>
           </div>
+        </div>
+        <div className="grid place-items-center">
+          <Button
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            className={`xl:hidden mr-2 transform transition-transform duration-300 ${
+              sidebarOpen ? "scale-x-[-1]" : "scale-x-[1]"
+            }`}
+          >
+            {!sidebarOpen ? (
+              <Menu className="h-6 w-6" />
+            ) : (
+              <X className="h-6 w-6" />
+            )}
+          </Button>
         </div>
 
         <nav className="hidden md:flex items-center">
@@ -75,28 +93,11 @@ const Navbar = () => {
               <Moon className="w-5 h-5 text-[#D4AA7D]" />
             )}
           </Button>
-          {walletIsConnected ? (
-            <Button
-              onClick={() => setWalletIsConnected(!walletIsConnected)}
-              className="gap-2 bg-[#D4AA7D] hover:bg-[#EFD09E] text-black"
-            >
-              <Wallet className="w-4 h-4" />
-              Connect
-            </Button>
-          ) : (
-            <Button
-              onClick={() => setWalletIsConnected(!walletIsConnected)}
-              className="gap-2 bg-[#D4AA7D] hover:bg-[#EFD09E] text-black"
-            >
-              <Wallet className="w-4 h-4" />
-              <span className="hidden sm:inline">0x1234...5678</span>
-              <span className="sm:hidden">Connected</span>
-            </Button>
-          )}
+          <WalletMultiButton />
         </div>
       </div>
     </header>
   );
 };
- 
-export default Navbar;
+
+export default Header;

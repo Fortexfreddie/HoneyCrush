@@ -10,7 +10,7 @@ const GameContext = createContext<GameContextType | undefined>(undefined)
 
 export const GameProvider = ({children}:{children: ReactNode}) => {
     const [score, setScore] = useState<number>(0)
-    const [timer, setTimer] = useState<number>(20)
+    const [timer, setTimer] = useState<number>(120)
     const [matched, setMatched] = useState<Set>(new Set())
     
 
