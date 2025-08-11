@@ -80,7 +80,7 @@ const Dashboard = () => {
           </div>
         </div>
 
-        <div className="p-6 md:p-8 rounded-[20px] bg-white/45 dark:bg-black/35 border border-white/35 dark:border-white/10 backdrop-blur-md shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
+        <div className="p-6 md:p-8 rounded-[20px] bg-white/45 dark:bg-black/35 border border-white/35 dark:border-white/10 backdrop-blur-md shadow-[0_10px_30px_rgba(0,0,0,0.15)] relative z-10">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-xl md:text-2xl font-bold">Featured Avatars</h3>
             <div className="flex gap-2">
