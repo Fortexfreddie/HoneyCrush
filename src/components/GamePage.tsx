@@ -2,7 +2,7 @@ import Button from "./UI/Button";
 import { User } from "lucide-react";
 import { useState, useRef } from "react";
 import NeonBee from "../assets/neon-bee-avatar-rare.png";
-import { useGame } from "../context/GameContext";
+import { useGame } from "../contexts/GameContext";
 
 const GamePage = () => {
   const colors = [
@@ -15,7 +15,7 @@ const GamePage = () => {
     "#654321", // brown
     "#E74C3C", // red
   ];
-  const timerRef = useRef<number | null>(null)
+  const timerRef = useRef<number | null>(null);
   const { timer, setTimer, score, setScore } = useGame();
   const [boardSize, setBoardSize] = useState<number>(36);
   const getRandomColor = (colors: string[]) => {
@@ -234,14 +234,14 @@ const GamePage = () => {
   // Resolve matches with animation, gravity, refills, and scoring.
   // widthArg is passed in to avoid stale width during a board size switch.
   const resolveBoard = async (
-  initial: string[],
-  widthArg?: number,
-  options?: { awardScore?: boolean }
+    initial: string[],
+    widthArg?: number,
+    options?: { awardScore?: boolean }
   ) => {
-  const w = widthArg ?? width;
-  const awardScore = options?.awardScore !== false;
-  setIsResolving(true);
-  let current: string[] = initial;
+    const w = widthArg ?? width;
+    const awardScore = options?.awardScore !== false;
+    setIsResolving(true);
+    let current: string[] = initial;
 
     while (true) {
       const matches = checkMatches(current, w);
@@ -259,7 +259,7 @@ const GamePage = () => {
       const { board: clearedBoard, cleared } = clearMatches(current, matches);
       // Update score (+1 per cleared tile) - stored in GameContext
       if (awardScore) {
-      setScore((prev: number) => prev + cleared);
+        setScore((prev: number) => prev + cleared);
       }
 
       // Apply gravity, then refill, then continue to look for cascades
@@ -288,10 +288,10 @@ const GamePage = () => {
   };
 
   const endTheGame = async () => {
-    if(timerRef.current) clearInterval(timerRef.current)
+    if (timerRef.current) clearInterval(timerRef.current);
     setHasStarted(false);
-    setTimer(20)
-  }
+    setTimer(20);
+  };
 
   //start button function
   const startTheGame = async () => {
@@ -399,7 +399,9 @@ const GamePage = () => {
                 Pause
               </Button> */}
               <Button
-              onClick={() => {endTheGame()}}
+                onClick={() => {
+                  endTheGame();
+                }}
                 className="
                    bg-transparent border-2 border-[#D4AA7D] text-[#D4AA7D] 
                   hover:bg-[#D4AA7D] hover:text-black
