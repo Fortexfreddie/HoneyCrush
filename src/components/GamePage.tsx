@@ -399,7 +399,9 @@ const GamePage = () => {
                 Pause
               </Button> */}
               <Button
-              onClick={() => {endTheGame()}}
+                onClick={() => {
+                  endTheGame();
+                }}
                 className="
                    bg-transparent border-2 border-[#D4AA7D] text-[#D4AA7D] 
                   hover:bg-[#D4AA7D] hover:text-black
