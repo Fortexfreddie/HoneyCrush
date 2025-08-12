@@ -11,6 +11,7 @@ import FundWalletButton from "../FundWalletButton";
 import GetHoneynetBalanceButton from "../GetHoneynetBalanceButton";
 import { useNavigate } from "react-router-dom";
 import DelegateForm from "../DelegateForm";
+import ProjectDriverForm from "../ProjectDriverForm";
 
 const Settings = () => {
   const [isOn, setIsOn] = useState(false);
@@ -75,6 +76,14 @@ const Settings = () => {
               className="mt-1 w-full px-3 py-2 rounded-xl bg-white/60 dark:bg-black/30 border border-white/20"
               placeholder="e.g. 800"
             />
+          </div>
+        </div>
+        <div className="flex flex-col justify-between p-4 md:p-5 space-y-4 bg-white/45 dark:bg-black/35 backdrop-blur-md rounded-2xl border border-white/35 dark:border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
+          <h2 className="font-bold flex items-center gap-2">
+            <UserCheck className="w-4 h-4 text-[#D4AA7D]" /> Project Driver
+          </h2>
+          <div>
+            <ProjectDriverForm />
           </div>
         </div>
         <div className="flex flex-col justify-between p-4 md:p-5 space-y-4 bg-white/45 dark:bg-black/35 backdrop-blur-md rounded-2xl border border-white/35 dark:border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.15)]">

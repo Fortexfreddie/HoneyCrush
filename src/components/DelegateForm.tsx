@@ -15,9 +15,9 @@ const DelegateForm = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (!wallet.publicKey || !wallet.signTransaction) {
-        alert("Please connect your wallet first");
-        return;
+        if (!wallet.publicKey) {
+            alert("Please connect your wallet first");
+            return;
         }
 
         if (!delegateAddress) {
@@ -27,40 +27,40 @@ const DelegateForm = () => {
 
         setLoading(true);
 
-        try{
-            console.log("Authority:", wallet.publicKey.toBase58());
-            console.log(delegateAddress);
-            console.log(localStorage.getItem("honeycomb_project"));
-            // Create the delegate authority transaction
-            const { createCreateDelegateAuthorityTransaction } = await client.createCreateDelegateAuthorityTransaction({
-                authority: wallet.publicKey.toBase58(),
+        try {
+            const adminPublicKey = wallet.publicKey?.toBase58();
+            const payer = adminPublicKey;
+            // const projectAddress = localStorage.getItem("honeycomb_project") || "";
+
+            // if (!projectAddress) {
+            //     throw new Error("No project address found in local storage");
+            // }
+
+            const {
+                createCreateDelegateAuthorityTransaction,
+            } = await client.createCreateDelegateAuthorityTransaction({
+                authority: adminPublicKey!,
                 delegate: delegateAddress,
-                project: localStorage.getItem("honeycomb_project") || "", // get your project address here
-                payer: wallet.publicKey.toBase58(),
+                project: "6RxLwcFGyptwJEdvUML9dwg61yJBBzPk8Dfu5Er8yB9S",
+                payer,
                 serviceDelegations: {
-                    HiveControl: [
-                        {
-                        // permission: HiveControlPermissionInput.ManageProjectDriver,
-                        permission: selectedPermission,
-                        },
-                    ],
+                HiveControl: [
+                    {
+                    permission: selectedPermission,
+                    },
+                ],
                 },
             });
 
-            // Sign and send transaction
-            const response = await sendClientTransactions(
-                client,
-                wallet,
-                createCreateDelegateAuthorityTransaction
-            );
+            await sendClientTransactions(client, wallet, createCreateDelegateAuthorityTransaction);
 
-            console.log("Delegate authority created. Response:", response);
             alert("Delegate authority successfully created!");
+            console.log("Delegate authority created for:", delegateAddress);
 
             setDelegateAddress("");
         } catch (err) {
             console.error("Failed to create delegate authority", err);
-            alert("Failed to create delegate authority. See console for details.");
+            alert("Failed to create delegate authority (see console for details)");
         } finally {
             setLoading(false);
         }
