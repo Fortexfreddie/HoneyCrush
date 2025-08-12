@@ -16,50 +16,54 @@ const CreateProjectButton = () => {
 
         setLoading(true);
         try {
-        const { createCreateProjectTransaction } =
+          const { createCreateProjectTransaction } =
             await client.createCreateProjectTransaction({
-            name: "HoneyCrush Game",
-            authority: wallet.publicKey.toBase58(),
-            payer: wallet.publicKey.toBase58(),
-            profileDataConfig: {
+              name: "HoneyCrush Game",
+              authority: wallet.publicKey.toBase58(),
+              payer: wallet.publicKey.toBase58(),
+              profileDataConfig: {
                 achievements: [
-                "Puzzle Master",
-                "Speed Solver",
-                "Combo King",
-                "Treasure Collector",
-                "Level Legend",
+                  "Puzzle Master",
+                  "Speed Solver",
+                  "Combo King",
+                  "Treasure Collector",
+                  "Level Legend",
                 ],
                 customDataFields: [
-                "Games Played",
-                "High Score",
-                "Nectar Earned",
-                "Last Active",
+                  "Games Played",
+                  "High Score",
+                  "Nectar Earned",
+                  "Last Active",
                 ],
-            },
+              },
             });
 
-        // createCreateProjectTransaction returns an object that has the tx payload.
-        // pass it into sendClientTransactions (this signs with the connected wallet and submits).
-        const response = await sendClientTransactions(
+          // createCreateProjectTransaction returns an object that has the tx payload.
+          // pass it into sendClientTransactions (this signs with the connected wallet and submits).
+          const response = await sendClientTransactions(
             client,
             wallet,
             createCreateProjectTransaction.tx ?? createCreateProjectTransaction
-        );
-        // `response` shape depends on the helper; you should get the sent tx info.
-        console.log("Project created. Response:", response);
+          );
+          // `response` shape depends on the helper; you should get the sent tx info.
+          console.log("Project created. Response:", response);
 
-        // if the `project` address is returned separately by the create call, save it:
-        // (some docs show `project` alongside `tx` in the returned object)
-        if (createCreateProjectTransaction.project) {
+          // if the `project` address is returned separately by the create call, save it:
+          // (some docs show `project` alongside `tx` in the returned object)
+          if (createCreateProjectTransaction.project) {
             localStorage.setItem(
-            "honeycomb_project",
-            createCreateProjectTransaction.project
+              "honeycomb_project",
+              createCreateProjectTransaction.project
             );
             console.log(
-            "Project address saved:",
-            createCreateProjectTransaction.project
+              "Project address saved:",
+              createCreateProjectTransaction.project
             );
-        }
+          }
+
+          // console.log("Full create project response:", createCreateProjectTransaction);
+          // console.log("Project address (if any):", createCreateProjectTransaction.project);
+          // console.log("Project address (if any):", createCreateProjectTransaction.tx);
         } catch (err) {
             console.error("Failed to create project", err);
             alert("Failed to create project (see console)");

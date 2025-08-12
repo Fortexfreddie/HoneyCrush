@@ -58,7 +58,7 @@ const Sidebar = () => {
             {/* Mobile Sidebar */}
             {
                 sidebarOpen && (
-                    <aside className="lg:hidden fixed top-5 left-6 z-50 p-4 h-[90vh] w-60 rounded-2xl bg-white/35 dark:bg-black/28 border border-white/30 dark:border-white/12 backdrop-blur-md shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
+                    <aside className="lg:hidden fixed top-5 left-6 z-50 p-4 h-[90vh] w-60 rounded-2xl bg-white/80 dark:bg-black/80 border border-white/30 dark:border-white/12 backdrop-blur-md shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
                         <div className="flex items-center justify-between w-full border-b border-black/30 dark:border-white/50 pb-4">
                             <div className="flex items-center gap-2">
                                 <div className="w-9 h-9 rounded-xl bg-[#272727] grid place-items-center shadow-[0_0_0_2px_rgba(212,170,125,0.35)_inset,0_0_16px_rgba(212,170,125,0.35),0_0_32px_rgba(122,92,255,0.25)]">

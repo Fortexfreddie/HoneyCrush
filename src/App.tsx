@@ -9,6 +9,7 @@ import Admin from "./pages/Admin";
 import AdminDashboard from "./components/Admin/AdminDashboard";
 import Users from "./components/Admin/Users";
 import Settings from "./components/Admin/Settings";
+import Maintenance from "./pages/Maintenance";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
         <Route path="/missions" element={<Missions />} />
         <Route path="/game" element={<Game />} />
         <Route path="/tutorial" element={<Tutorial />} />
+        <Route path="/maintenance" element={<Maintenance />} />
         <Route path="/admin" element={<Admin />}>
           <Route index element={<AdminDashboard />} />
           <Route path="/admin/users" element={<Users />} />
