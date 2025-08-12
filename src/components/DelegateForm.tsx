@@ -41,7 +41,7 @@ const DelegateForm = () => {
             } = await client.createCreateDelegateAuthorityTransaction({
                 authority: adminPublicKey!,
                 delegate: delegateAddress,
-                project: "6RxLwcFGyptwJEdvUML9dwg61yJBBzPk8Dfu5Er8yB9S",
+                project: import.meta.env.VITE_HONEYCOMB_PROJECT_ID,
                 payer,
                 serviceDelegations: {
                 HiveControl: [

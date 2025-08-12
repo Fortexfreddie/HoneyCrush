@@ -11,7 +11,7 @@ const ProjectDriverForm = () => {
     const [loading, setLoading] = useState(false);
 
     // Hardcoded values
-    const projectAddress = "6RxLwcFGyptwJEdvUML9dwg61yJBBzPk8Dfu5Er8yB9S";
+    const projectAddress = import.meta.env.VITE_HONEYCOMB_PROJECT_ID;
     const adminPublicKey = wallet.publicKey?.toBase58();
     const payerPublicKey = adminPublicKey;
 
