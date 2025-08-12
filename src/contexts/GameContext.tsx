@@ -1,18 +1,20 @@
 import { createContext, useContext , type SetStateAction, type ReactNode, useState, type Dispatch} from "react";
 export interface GameContextType {
-    score: number
-    setScore: Dispatch<SetStateAction<number>>
+    score: number[]
+    setScore: Dispatch<SetStateAction<number[]>>
     timer: number
     setTimer: Dispatch<SetStateAction<number>>
+    total: number
+    setTotal: Dispatch<SetStateAction<number>>
 }
 
 const GameContext = createContext<GameContextType | undefined>(undefined)
 
 export const GameProvider = ({children}:{children: ReactNode}) => {
-    const [score, setScore] = useState<number>(0)
+    const [score, setScore] = useState<number[]>([])
     const [timer, setTimer] = useState<number>(120)
-    const [matched, setMatched] = useState<Set>(new Set())
-    
+    const [total, setTotal] = useState<number>(0)
+    // const [matched, setMatched] = useState<Set>(new Set())
 
 
     return (
@@ -21,7 +23,9 @@ export const GameProvider = ({children}:{children: ReactNode}) => {
                 score,
                 setScore,
                 timer,
-                setTimer
+                setTimer,
+                total,
+                setTotal
             }}
         
         >{children}</GameContext.Provider>
