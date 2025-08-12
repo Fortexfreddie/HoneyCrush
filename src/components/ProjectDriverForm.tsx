@@ -11,7 +11,7 @@ const ProjectDriverForm = () => {
     const [loading, setLoading] = useState(false);
 
     // Hardcoded values
-    const projectAddress = "7ovRwhnZAbP2vZ2FxmmmL14KR5eAvR4o1Q5p8q6nifjQ";
+    const projectAddress = "6RxLwcFGyptwJEdvUML9dwg61yJBBzPk8Dfu5Er8yB9S";
     const adminPublicKey = wallet.publicKey?.toBase58();
     const payerPublicKey = adminPublicKey;
 
