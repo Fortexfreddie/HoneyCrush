@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
-import { client } from "../lib/honeycombClient";
+import { client } from "../../lib/honeycombClient";
 import { sendClientTransactions } from "@honeycomb-protocol/edge-client/client/walletHelpers";
 import { Plus } from "lucide-react";
 

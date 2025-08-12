@@ -1,8 +1,8 @@
-import Button from "./UI/Button";
+import Button from "../UI/Button";
 import { UserCheck } from "lucide-react";
 import { useState } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
-import { client } from "../lib/honeycombClient";
+import { client } from "../../lib/honeycombClient";
 import { sendClientTransactions } from "@honeycomb-protocol/edge-client/client/walletHelpers";
 import { HiveControlPermissionInput } from "@honeycomb-protocol/edge-client";
 
