@@ -30,7 +30,6 @@ const FundWalletButton = () => {
         setLoading(false);
         }
     };
-
     return (
         <button
             onClick={requestHoneynetSol}

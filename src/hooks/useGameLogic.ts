@@ -192,7 +192,7 @@ export function useGameLogic() {
       setScore([]);
     }
     setHasStarted(false);
-    setTimer(0);
+    setTimer(120);
   };
 
   const startTheGame = async () => {
@@ -207,11 +207,14 @@ export function useGameLogic() {
         if (prev <= 1) {
           if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
           const roundScore = scoreRef.current;
-          if (roundScore > 0) {
-            setTotal((prevTotal) => prevTotal + roundScore);
-            setScore([]);
-          }
-          setHasStarted(false);
+          // Defer cross-state updates to avoid nested setState during a state updater (React warning)
+          setTimeout(() => {
+            if (roundScore > 0) {
+              setTotal((prevTotal) => prevTotal + roundScore);
+              setScore([]);
+            }
+            setHasStarted(false);
+          }, 0);
           return 0;
         }
         return prev - 1;
