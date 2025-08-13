@@ -5,7 +5,8 @@ import {
   Wallet,
   AlertTriangle,
   UserCheck,
-  TreePine
+  TreePine,
+  Plus
 } from "lucide-react";
 import CreateProjectButton from "../HoneyComb/CreateProjectButton";
 import FundWalletButton from "../HoneyComb/FundWalletButton";
@@ -14,6 +15,10 @@ import { useNavigate } from "react-router-dom";
 import DelegateForm from "../HoneyComb/DelegateForm";
 import ProjectDriverForm from "../HoneyComb/ProjectDriverForm";
 import CreateProfilesTreeButton from "../HoneyComb/CreateProfilesTreeButton";
+import CreateNectarResourceButton from "../HoneyComb/CreateNectarResourceButton";
+import MintResourceButton from "../HoneyComb/MintResourceButton";
+import CreateResourseTreeButton from "../HoneyComb/CreateResourseTreeButton";
+
 
 const Settings = () => {
   const [isOn, setIsOn] = useState(false);
@@ -79,7 +84,7 @@ const Settings = () => {
             />
           </div>
         </div>
-      <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="mt-4 grid grid-cols-1 md:grid-cols-2 items-center gap-4">
         <div className="flex flex-col justify-between p-4 md:p-5 space-y-4 bg-white/45 dark:bg-black/35 backdrop-blur-md rounded-2xl border border-white/35 dark:border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
           <h2 className="font-bold flex items-center gap-2">
             <FolderPlus className="w-4 h-4 text-[#D4AA7D]" /> Project Management
@@ -113,6 +118,33 @@ const Settings = () => {
           <div>
             <DelegateForm />
           </div>
+        </div>
+        <div className="flex flex-col justify-between p-4 md:p-5 space-y-4 bg-white/45 dark:bg-black/35 backdrop-blur-md rounded-2xl border border-white/35 dark:border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
+          <h2 className="font-bold flex items-center gap-2">
+            <Plus className="w-4 h-4 text-[#D4AA7D]" /> Create Resource
+          </h2>
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            Create Nectar Resource
+          </p>
+          <CreateNectarResourceButton />
+        </div>
+        <div className="flex flex-col justify-between p-4 md:p-5 space-y-4 bg-white/45 dark:bg-black/35 backdrop-blur-md rounded-2xl border border-white/35 dark:border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
+          <h2 className="font-bold flex items-center gap-2">
+            <Plus className="w-4 h-4 text-[#D4AA7D]" /> Create Merkle tree
+          </h2>
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            Create the Merkle tree for the nectar Resource
+          </p>
+          <CreateResourseTreeButton />
+        </div>
+        <div className="flex flex-col justify-between p-4 md:p-5 space-y-4 bg-white/45 dark:bg-black/35 backdrop-blur-md rounded-2xl border border-white/35 dark:border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
+          <h2 className="font-bold flex items-center gap-2">
+            <Plus className="w-4 h-4 text-[#D4AA7D]" /> Mint Resource
+          </h2>
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            Mint Nectar Resource for a user (to the address)
+          </p>
+          <MintResourceButton />
         </div>
         <div className="flex flex-col justify-between p-4 md:p-5 space-y-4 bg-white/45 dark:bg-black/35 backdrop-blur-md rounded-2xl border border-white/35 dark:border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
           <h2 className="font-bold flex items-center gap-2">

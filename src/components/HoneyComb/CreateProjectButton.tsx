@@ -49,7 +49,7 @@ const CreateProjectButton = () => {
 
     return (
         <div>
-            <p className="text-xs text-wrap font-semibold text-gray-600 dark:text-gray-400 mb-4">
+            <p className="text-xs text-wrap font-semibold text-gray-600 dark:text-gray-400 mb-2">
                 Project ID: {projectID}
             </p>
             <button

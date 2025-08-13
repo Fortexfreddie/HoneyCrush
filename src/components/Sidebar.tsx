@@ -36,7 +36,7 @@ const Sidebar = () => {
         <>
             {/* Desktop Sidebar */}
             <aside
-                className="hidden lg:block p-4 h-fit w-72 rounded-2xl bg-white/35 dark:bg-black/28 border border-white/30 dark:border-white/12 backdrop-blur-md shadow-[0_10px_30px_rgba(0,0,0,0.15)]"
+                className="hidden lg:block sticky top-5 p-4 h-fit w-72 rounded-2xl bg-white/35 dark:bg-black/28 border border-white/30 dark:border-white/12 backdrop-blur-md shadow-[0_10px_30px_rgba(0,0,0,0.15)]"
             >
                 <div className="flex items-center w-full border-b border-black/30 dark:border-white/50 pb-4">
                     <div className="flex items-center gap-2">
