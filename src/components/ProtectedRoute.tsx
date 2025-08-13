@@ -23,7 +23,9 @@ function ProtectedRoute({ children }: { children: ReactNode }) {
       hasShown.current = true;
     }
 
-    if (publicKey) {
+    // Always close modal when wallet is connected
+    if (connected && isOpen) {
+      setIsOpen(false);
       hasShown.current = false;
     }
   }, [connected, publicKey, isOpen, setIsOpen, initialCheckDone]);
