@@ -7,6 +7,7 @@ import {
   type Profile,
   createOrFetchProfile,
   getLevelProgress,
+  addXpToProfile,
 } from "../hooks/useHoneycombProfile";
 import { useWallet } from "@solana/wallet-adapter-react";
 
@@ -47,6 +48,32 @@ const GamePage = () => {
 
   const currentScore = score.reduce((sum, val) => sum + val, 0);
   const level = getLevelProgress(profile?.platformData?.xp);
+
+  // End Game handler that also awards XP on-chain and refreshes the profile
+  // - Computes XP from the round's score (simple formula: score/5, min 1)
+  // - Calls the original endTheGame to finalize the run
+  // - If wallet/profile available, writes XP via Honeycomb and re-fetches the profile
+  const handleEndGame = async () => {
+    const roundScore = currentScore; // snapshot before endTheGame resets state
+
+    // Finish the game (locks interactions and resets scores/timer)
+    endTheGame();
+
+    // Only update XP when the wallet is connected and we have a profile address
+    if (!wallet.connected || !wallet.publicKey || !profile?.address) return;
+
+    // Simple XP formula; adjust as needed
+    const earnedXp = Math.max(1, Math.floor(roundScore / 5));
+
+    try {
+      await addXpToProfile(wallet, profile.address, earnedXp);
+      // Re-fetch the profile so the progress bar reflects on-chain XP
+      const updated = await createOrFetchProfile(wallet);
+      setProfile(updated);
+    } catch (e) {
+      console.error("Failed to update XP:", e);
+    }
+  };
 
   return (
     <div className="px-4 py-8 md:py-12">
@@ -129,9 +156,7 @@ const GamePage = () => {
                 Pause
               </Button> */}
               <Button
-                onClick={() => {
-                  endTheGame();
-                }}
+                onClick={handleEndGame}
                 className="
                    bg-transparent border-2 border-[#D4AA7D] text-[#D4AA7D] 
                   hover:bg-[#D4AA7D] hover:text-black

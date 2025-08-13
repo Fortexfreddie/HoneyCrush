@@ -37,7 +37,10 @@ export interface Profile {
     };
 }
 
-
+/**
+ * Normalize a raw profile response from the Honeycomb edge client
+ * into a shape we can use safely in the UI.
+ */
 function normalizeProfile(apiProfile: any): Profile {
   return {
     address: apiProfile.address,
@@ -58,7 +61,6 @@ function normalizeProfile(apiProfile: any): Profile {
       : undefined,
   };
 }
-
 
 /**
  * Ensures the connected wallet has a profile.
@@ -83,7 +85,7 @@ export async function createOrFetchProfile(
     });
 
     // This will usually contain 0 or more profiles
-    let profile = search?.profile?.find((p) =>
+    let profile = search?.profile?.find((p: any) =>
       p.user?.wallets?.wallets?.includes(walletBase58)
     ) ?? null;
 
@@ -111,7 +113,7 @@ export async function createOrFetchProfile(
         });
 
         profile =
-        afterCreate?.profile?.find((p) =>
+        afterCreate?.profile?.find((p: any) =>
             p.user?.wallets?.wallets?.includes(walletBase58)
         ) ?? null;
     }
@@ -119,9 +121,12 @@ export async function createOrFetchProfile(
     return profile ? normalizeProfile(profile) : null;
 }
 
+/**
+ * Compute level/progress values for the progress bar using total XP from profile.platformData.xp.
+ * Level 0 → 1 requires 100 XP, then each next level requires +25% XP (floored).
+ */
 export function getLevelProgress(totalXp?: number | null) {
   const xp = Math.max(0, Number(totalXp ?? 0));
-  // Base requirement for level 1, grows by 25% per level
   let level = 0;
   let requirement = 100; // XP to go from level 0 -> 1
   let remaining = xp;
@@ -134,17 +139,28 @@ export function getLevelProgress(totalXp?: number | null) {
 
   const progress = requirement > 0 ? remaining / requirement : 0;
   return {
-    level,       // current level (0-based; display as level)
+    level,            // current level (0-based; display as level)
     current: remaining, // xp inside current level
     required: requirement, // xp required to reach next level
-    progress,   // 0..1
+    progress,         // 0..1 for progress bar fill
   };
 }
 
 /**
- * Create the Nectar resource as a project Resource on Honeycomb.
- * Reusable function that takes the wallet context like other helpers in this module.
- * Returns the created resource address if available from the response.
+ * Internal helper to obtain the project ID from localStorage or env.
+ */
+function getProjectId(): string {
+  const ls = typeof window !== "undefined" ? window.localStorage.getItem("honeycomb_project") : null;
+  const env = (import.meta as any)?.env?.VITE_HONEYCOMB_PROJECT_ID as string | undefined;
+  const project = ls || env;
+  if (!project) throw new Error("Project ID not configured. Set localStorage.honeycomb_project or VITE_HONEYCOMB_PROJECT_ID");
+  return project;
+}
+
+/**
+ * Create the Nectar resource as a project Resource on Honeycomb (LedgerState storage).
+ * This does not affect profile XP; it creates a fungible in-game currency tracked by Honeycomb's ledger.
+ * Returns the created resource address if the API returns it.
  */
 export async function createNectarResource(
   wallet: WalletContextState,
@@ -153,10 +169,7 @@ export async function createNectarResource(
   if (!wallet.publicKey) throw new Error("Wallet not connected");
 
   const payer = wallet.publicKey.toBase58();
-  const project =
-    (typeof window !== "undefined" && window.localStorage.getItem("honeycomb_project")) ||
-    (import.meta as any)?.env?.VITE_HONEYCOMB_PROJECT_ID;
-  if (!project) throw new Error("Project ID not configured");
+  const project = getProjectId();
 
   const { createCreateNewResourceTransaction } =
     await client.createCreateNewResourceTransaction({
@@ -176,19 +189,122 @@ export async function createNectarResource(
   await sendClientTransactions(
     client,
     wallet,
-    createCreateNewResourceTransaction.tx ?? createCreateNewResourceTransaction
+    createCreateNewResourceTransaction
   );
 
-  // Return the resource address if provided by the API
+  // If available in response, return the resource address
   return (createCreateNewResourceTransaction as any)?.resource;
 }
 
-export async function mintNectar(resource: string, wallet: WalletContextState): Promise<string | undefined>{
+/**
+ * Create an XP resource. This is optional and separate from profile.platformData.xp.
+ * - Keep decimals at 0 so XP is an integer resource (no fractions).
+ * - This will not change how your progress bar works (it still uses profile.platformData.xp).
+ */
+export async function createXpResource(
+  wallet: WalletContextState,
+  resourceMetaUri: string = "https://example.com/xp.json"
+): Promise<string | undefined> {
   if (!wallet.publicKey) throw new Error("Wallet not connected");
-    const payer = wallet.publicKey.toBase58()
 
-  const {createMintResourceTransaction :txResponse} = await client.createMintResourceTransaction({
-    amount: '500',
+  const payer = wallet.publicKey.toBase58();
+  const project = getProjectId();
+
+  const { createCreateNewResourceTransaction } =
+    await client.createCreateNewResourceTransaction({
+      authority: payer,
+      payer,
+      project,
+      params: {
+        name: "Experience Points",
+        symbol: "XP",
+        decimals: 0, // XP as whole numbers
+        storage: ResourceStorageEnum.LedgerState,
+        uri: resourceMetaUri,
+        tags: ["game", "xp"],
+      },
+    });
+
+  await sendClientTransactions(
+    client,
+    wallet,
+    createCreateNewResourceTransaction
+  );
+
+  return (createCreateNewResourceTransaction as any)?.resource;
+}
+
+/**
+ * Generic resource mint helper. Mints an amount of a Resource to an owner wallet.
+ * - resourceAddress: Resource account (string)
+ * - amount: string integer (respect resource decimals). Example: "50000"
+ * - ownerBase58: recipient wallet; defaults to connected wallet
+ * Notes:
+ *   - In Honeycomb LedgerState, balances are tracked per wallet, effectively attaching to the user.
+ *   - This is what you should call when the user presses a "Claim" button after mission completion.
+ */
+export async function mintResourceToUser(
+  wallet: WalletContextState,
+  resourceAddress: string,
+  amount: string,
+  ownerBase58?: string
+): Promise<void> {
+  if (!wallet.publicKey) throw new Error("Wallet not connected");
+
+  const payer = wallet.publicKey.toBase58();
+  const owner = ownerBase58 ?? payer;
+
+  const { createMintResourceTransaction } = await client.createMintResourceTransaction({
+    resource: resourceAddress,
+    amount,          // string, e.g. "50000"
     authority: payer,
-  })
+    owner,           // recipient wallet address
+    payer,           // the connected wallet pays fee by default
+  });
+
+  await sendClientTransactions(
+    client,
+    wallet,
+    createMintResourceTransaction
+  );
+}
+
+/**
+ * Convenience wrapper for Nectar specifically; delegates to mintResourceToUser.
+ */
+export async function mintNectarToUser(
+  wallet: WalletContextState,
+  nectarResourceAddress: string,
+  amount: string,
+  ownerBase58?: string
+): Promise<void> {
+  return mintResourceToUser(wallet, nectarResourceAddress, amount, ownerBase58);
+}
+
+/**
+ * Add XP to a profile's platform data on-chain. This is what feeds your progress bar.
+ * Use this after a match or mission completion so Level/progress updates correctly.
+ */
+export async function addXpToProfile(
+  wallet: WalletContextState,
+  profileAddress: string,
+  xp: number
+): Promise<void> {
+  if (!wallet.publicKey) throw new Error("Wallet not connected");
+  if (xp <= 0) return;
+
+  const payer = wallet.publicKey.toBase58();
+
+  const { createUpdatePlatformDataTransaction } = await client.createUpdatePlatformDataTransaction({
+    authority: payer,
+    payer,
+    profile: profileAddress,
+    platformData: { addXp: xp.toString() },
+  });
+
+  await sendClientTransactions(
+    client,
+    wallet,
+    createUpdatePlatformDataTransaction
+  );
 }
