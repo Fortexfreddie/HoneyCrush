@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Connection, PublicKey } from "@solana/web3.js";
+import { Connection, PublicKey, clusterApiUrl } from "@solana/web3.js";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { Coins } from "lucide-react";
 
@@ -17,6 +17,7 @@ const FundWalletButton = () => {
         setLoading(true);
         try {
             const conn = new Connection("https://rpc.test.honeycombprotocol.com");
+            // const conn = new Connection(clusterApiUrl("devnet"));
             const pubkey = new PublicKey(wallet.publicKey);
             const sig = await conn.requestAirdrop(pubkey, 2 * 1e9); // 2 SOL
             await conn.confirmTransaction(sig, "confirmed");

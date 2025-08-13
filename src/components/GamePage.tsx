@@ -1,366 +1,50 @@
 import Button from "./UI/Button";
+import { useEffect, useState } from "react";
 import { User } from "lucide-react";
-import { useState, useRef, useEffect } from "react";
 import NeonBee from "../assets/neon-bee-avatar-rare.png";
-import { useGame } from "../contexts/GameContext";
-
-const COLORS = [
-  "#FF0000", // red
-  "#00CED1", // dark turquoise
-  "#FFD700", // gold
-  "#8A2BE2", // blue-violet
-  "#0000FF", // blue
-  "#FF1493", // deep pink
-  "#00FF7F", // spring green
-  "#FF6347", // tomato
-];
-
-const getRandomColor = (colors: string[]) => {
-  return colors[Math.floor(Math.random() * colors.length)];
-};
+import { useGameLogic } from "../hooks/useGameLogic";
+import {
+  type Profile,
+  createOrFetchProfile,
+} from "../hooks/useHoneycombProfile";
+import { useWallet } from "@solana/wallet-adapter-react";
 
 const GamePage = () => {
-  // colors moved to top-level constant COLORS
+  const wallet = useWallet();
+  const [profile, setProfile] = useState<Profile | null>(null);
 
-  const timerRef = useRef<number | null>(null);
-  const { timer, setTimer, setScore, score, total, setTotal } = useGame();
+  useEffect(() => {
+    if (wallet.connected && wallet.publicKey) {
+      createOrFetchProfile(wallet)
+        .then((profileData) => setProfile(profileData))
+        .catch((err) => {
+          console.error("Profile error:", err);
+        });
+    }
+  }, [wallet, wallet.connected, wallet.publicKey]);
+
+  const {
+    // COLORS,
+    boardSize,
+    // setBoardSize,
+    board,
+    // setBoard,
+    // draggedTile,
+    setDraggedTile,
+    // width,
+    matched,
+    isResolving,
+    hasStarted,
+    timer,
+    score,
+    total,
+    startTheGame,
+    endTheGame,
+    regenerateBoard,
+    handleDrop,
+  } = useGameLogic();
+
   const currentScore = score.reduce((sum, val) => sum + val, 0);
-  const scoreRef = useRef<number>(currentScore);
-  useEffect(() => {
-    scoreRef.current = currentScore;
-  }, [currentScore]);
-
-  const [boardSize, setBoardSize] = useState<number>(36);
-  // getRandomColor moved to top-level
-  const [board, setBoard] = useState<string[]>(
-    [...Array(36)].map(() => getRandomColor(COLORS))
-  );
-  const [draggedTile, setDraggedTile] = useState<number | null>(null);
-  const width = boardSize === 36 ? 6 : 4;
-  // Tiles currently flagged as matched (for destroy animation)
-  const [matched, setMatched] = useState<Set<number>>(new Set());
-  // Lock user input while resolving cascades
-  const [isResolving, setIsResolving] = useState<boolean>(false);
-  // Game active flag - prevents interaction until Start is clicked
-  const [hasStarted, setHasStarted] = useState<boolean>(false);
-
-  // Small helper to wait for CSS transitions
-  const sleep = (ms: number) => new Promise((res) => setTimeout(res, ms));
-
-  // Cleanup timer interval on unmount
-  useEffect(() => {
-    return () => {
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-        timerRef.current = null;
-      }
-    };
-  }, []);
-
-  // Swap handler with adjacency validation and match resolution
-  const handleDrop = async (targetIndex: number) => {
-    // Ignore interactions while resolving animations/cascades or before game start or after time up
-    if (isResolving || !hasStarted || timer <= 0) return;
-    if (draggedTile === null || draggedTile === targetIndex) return;
-    // Only allow adjacent swaps
-    if (!isAdjacent(draggedTile, targetIndex, width)) {
-      setDraggedTile(null);
-      return;
-    }
-
-    // Try the swap in a copy
-    const swapped = [...board];
-    [swapped[draggedTile], swapped[targetIndex]] = [
-      swapped[targetIndex],
-      swapped[draggedTile],
-    ];
-
-    // Check if swap creates any match
-    const m = checkMatches(swapped, width);
-    if (m.size === 0) {
-      // Revert: do not commit a swap that doesn't create matches
-      setDraggedTile(null);
-      return;
-    }
-
-    // Commit the swap visually
-    setBoard(swapped);
-    setDraggedTile(null);
-
-    // Resolve matches/cascades with animation and scoring
-    await resolveBoard(swapped, width);
-  };
-
-  const handleCleared = (cleared: number) => {
-    setScore((prev) => [...prev, cleared]);
-  }
-  //for checking color match
-  const checkMatches = (board: string[], width: number): Set<number> => {
-    const matched = new Set<number>();
-    const height = Math.floor(board.length / width);
-
-    // Horizontal scan: iterate each row and find runs of length >= 3
-    for (let r = 0; r < height; r++) {
-      let c = 0;
-      while (c <= width - 3) {
-        const start = r * width + c;
-        const color = board[start];
-        if (!color) {
-          c++;
-          continue;
-        }
-        let run = 1;
-        while (c + run < width && board[r * width + (c + run)] === color) {
-          run++;
-        }
-        if (run >= 3) {
-          for (let k = 0; k < run; k++) {
-            matched.add(r * width + c + k);
-          }
-        }
-        c += run; // skip past this run
-      }
-    }
-
-    // Vertical scan: iterate each column and find runs of length >= 3
-    for (let c = 0; c < width; c++) {
-      let r = 0;
-      while (r <= height - 3) {
-        const start = r * width + c;
-        const color = board[start];
-        if (!color) {
-          r++;
-          continue;
-        }
-        let run = 1;
-        while (r + run < height && board[(r + run) * width + c] === color) {
-          run++;
-        }
-        if (run >= 3) {
-          for (let k = 0; k < run; k++) {
-            matched.add((r + k) * width + c);
-          }
-        }
-        r += run; // skip past this run
-      }
-    }
-    return matched;
-  };
-
-  //check if they are adjacent
-  const isAdjacent = (a: number, b: number, width: number): boolean => {
-    // Same row → difference of 1 but not wrapping
-    if (
-      Math.floor(a / width) === Math.floor(b / width) &&
-      Math.abs(a - b) === 1
-    ) {
-      return true;
-    }
-
-    // Same column → difference of exactly `width`
-    if (Math.abs(a - b) === width) {
-      return true;
-    }
-
-    return false;
-  };
-
-  // Clear matched tiles by setting them to null and return cleared count
-  const clearMatches = (
-    grid: string[],
-    matches: Set<number>
-  ): { board: (string | null)[]; cleared: number } => {
-    const next: (string | null)[] = [...grid];
-    matches.forEach((idx) => {
-      next[idx] = null;
-    });
-    return { board: next, cleared: matches.size };
-  };
-
-  // Apply gravity: for each column, let non-null tiles fall down
-  const applyGravity = (
-    grid: (string | null)[],
-    width: number
-  ): (string | null)[] => {
-    const height = Math.floor(grid.length / width);
-    const next = [...grid];
-
-    for (let c = 0; c < width; c++) {
-      // Collect non-null tiles from bottom to top
-      const stack: string[] = [];
-      for (let r = height - 1; r >= 0; r--) {
-        const idx = r * width + c;
-        const val = next[idx];
-        if (val) stack.push(val);
-      }
-      // Write back bottom-up
-      let r = height - 1;
-      for (const val of stack) {
-        next[r * width + c] = val;
-        r--;
-      }
-      // Fill remaining cells above with null
-      for (; r >= 0; r--) {
-        next[r * width + c] = null;
-      }
-    }
-    return next;
-  };
-
-  // Refill any null tiles with new random colors
-  const refill = (grid: (string | null)[], colors: string[]): string[] => {
-    return grid.map((v) => (v ? v : getRandomColor(colors)));
-  };
-
-  // Check if any single adjacent swap can produce a match
-  const hasPossibleMoves = (grid: string[], width: number): boolean => {
-    const size = grid.length;
-    const height = Math.floor(size / width);
-
-    for (let i = 0; i < size; i++) {
-      const r = Math.floor(i / width);
-      const c = i % width;
-
-      // Try swap to the right
-      if (c + 1 < width) {
-        const j = i + 1;
-        if (grid[j] !== grid[i]) {
-          const swapped = [...grid];
-          [swapped[i], swapped[j]] = [swapped[j], swapped[i]];
-          if (checkMatches(swapped, width).size > 0) return true;
-        }
-      }
-      // Try swap downward
-      if (r + 1 < height) {
-        const j = i + width;
-        if (grid[j] !== grid[i]) {
-          const swapped = [...grid];
-          [swapped[i], swapped[j]] = [swapped[j], swapped[i]];
-          if (checkMatches(swapped, width).size > 0) return true;
-        }
-      }
-    }
-    return false;
-  };
-
-  // Generate a fresh board with no immediate matches and at least one possible move
-  const generatePlayableBoard = (size: number, colors: string[]): string[] => {
-    const w = size === 36 ? 6 : 4;
-    for (let attempts = 0; attempts < 500; attempts++) {
-      const fresh = [...Array(size)].map(() => getRandomColor(colors));
-      if (checkMatches(fresh, w).size > 0) continue; // avoid immediate matches
-      if (hasPossibleMoves(fresh, w)) return fresh; // ensure at least one move
-    }
-    // Fallback (rare): return a random board; start will resolve if needed
-    return [...Array(size)].map(() => getRandomColor(colors));
-  };
-
-  // Resolve matches with animation, gravity, refills, and scoring.
-  // widthArg is passed in to avoid stale width during a board size switch.
-  const resolveBoard = async (
-    initial: string[],
-    widthArg?: number,
-    options?: { awardScore?: boolean }
-  ) => {
-    const w = widthArg ?? width;
-    const awardScore = options?.awardScore !== false;
-    setIsResolving(true);
-    let current: string[] = initial;
-
-    while (true) {
-      const matches = checkMatches(current, w);
-      if (matches.size === 0) {
-        // Clear any previous match flags and finish
-        setMatched(new Set());
-        break;
-      }
-
-      // Flag matched tiles for a brief destroy animation
-      setMatched(matches);
-      await sleep(200); // keep in sync with CSS duration (aligned with Tailwind duration-200)
-
-      // Clear matched tiles and score them
-      const { board: clearedBoard, cleared } = clearMatches(current, matches);
-      // Update score (+1 per cleared tile) - stored in GameContext
-      if (awardScore) {
-        handleCleared(cleared)
-      }
-
-      // Apply gravity, then refill, then continue to look for cascades
-      const afterGravity = applyGravity(clearedBoard, w);
-      const refilled = refill(afterGravity, COLORS);
-
-      // Publish the new board state for the next loop/cascade
-      setBoard(refilled);
-      current = refilled;
-    }
-
-    // After stabilizing, if no more possible moves remain, generate a new playable board
-    if (!hasPossibleMoves(current, w)) {
-      const fresh = generatePlayableBoard(boardSize, COLORS);
-      setBoard(fresh);
-    }
-
-    setIsResolving(false);
-  };
-
-  // Build a new board for a given size and immediately resolve any pre-existing matches
-  const regenerateBoard = async (size: number) => {
-    const fresh = generatePlayableBoard(size, COLORS);
-    setBoardSize(size);
-    setBoard(fresh);
-  };
-
-  const endTheGame = async () => {
-    if (timerRef.current) clearInterval(timerRef.current);
-    const roundScore = scoreRef.current;
-    if (roundScore > 0) {
-      setTotal((prev) => prev + roundScore);
-      setScore([]);
-    }
-    setHasStarted(false);
-    setTimer(0);
-  };
-
-  //start button function
-  const startTheGame = async () => {
-    // Stop any running timer to avoid multiple intervals
-    if (timerRef.current) {
-      clearInterval(timerRef.current);
-      timerRef.current = null;
-    }
-
-    // Reset state for a fresh run (do not add to total here to avoid double counting)
-    setScore([]);
-    setTimer(120);
-    setMatched(new Set());
-    setHasStarted(true);
-
-    // Clean the initial board so no immediate matches remain and ensure future moves exist,
-    // without awarding points for this cleanup
-    await resolveBoard([...board], width, { awardScore: false });
-
-    // Start countdown timer
-    timerRef.current = window.setInterval(() => {
-      setTimer((prev) => {
-        if (prev <= 1) {
-          if (timerRef.current) {
-            clearInterval(timerRef.current);
-            timerRef.current = null;
-          }
-          const roundScore = scoreRef.current;
-          if (roundScore > 0) {
-            setTotal((prevTotal) => prevTotal + roundScore);
-            setScore([]);
-          }
-          // lock the board when time is up
-          setHasStarted(false);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-  };
 
   return (
     <div className="px-4 py-8 md:py-12">
@@ -371,14 +55,14 @@ const GamePage = () => {
             <div className="flex items-center gap-4">
               <div className="w-16 h-16 rounded-xl backdrop-blur-md border border-white/20 overflow-hidden">
                 <img
-                  src={NeonBee}
+                  src={profile?.info?.pfp || NeonBee}
                   alt="User Avatar"
                   className="w-full h-full object-cover object-center"
                 />
               </div>
               <div className="flex flex-col">
-                <span className="text-xl font-bold">Cyber Bee v1</span>
-                <span>Level 2</span>
+                <span className="text-xl font-bold">{profile?.info?.name || "Player"}</span>
+                <span>{profile?.platformData?.xp || "Level 0"}</span>
               </div>
             </div>
             <div className="mt-4 grid grid-cols-3 gap-3">
