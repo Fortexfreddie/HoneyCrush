@@ -117,3 +117,25 @@ export async function createOrFetchProfile(
 
     return profile ? normalizeProfile(profile) : null;
 }
+
+export function getLevelProgress(totalXp?: number | null) {
+  const xp = Math.max(0, Number(totalXp ?? 0));
+  // Base requirement for level 1, grows by 25% per level
+  let level = 0;
+  let requirement = 100; // XP to go from level 0 -> 1
+  let remaining = xp;
+
+  while (remaining >= requirement) {
+    remaining -= requirement;
+    level += 1;
+    requirement = Math.floor(requirement * 1.25);
+  }
+
+  const progress = requirement > 0 ? remaining / requirement : 0;
+  return {
+    level,       // current level (0-based; display as level)
+    current: remaining, // xp inside current level
+    required: requirement, // xp required to reach next level
+    progress,   // 0..1
+  };
+}

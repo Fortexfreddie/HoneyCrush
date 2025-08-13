@@ -6,6 +6,7 @@ import { useGameLogic } from "../hooks/useGameLogic";
 import {
   type Profile,
   createOrFetchProfile,
+  getLevelProgress,
 } from "../hooks/useHoneycombProfile";
 import { useWallet } from "@solana/wallet-adapter-react";
 
@@ -45,6 +46,7 @@ const GamePage = () => {
   } = useGameLogic();
 
   const currentScore = score.reduce((sum, val) => sum + val, 0);
+  const level = getLevelProgress(profile?.platformData?.xp);
 
   return (
     <div className="px-4 py-8 md:py-12">
@@ -62,7 +64,15 @@ const GamePage = () => {
               </div>
               <div className="flex flex-col">
                 <span className="text-xl font-bold">{profile?.info?.name || "Player"}</span>
-                <span>{profile?.platformData?.xp || "Level 0"}</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm">Level {level.level}</span>
+                  <div className="w-40 h-2 rounded-full bg-black/10 dark:bg-white/10 overflow-hidden mt-1">
+                    <div
+                      className="h-full bg-[#D4AA7D] transition-all duration-300"
+                      style={{ width: `${Math.round(level.progress * 100)}%` }}
+                    />
+                  </div>
+                </div>
               </div>
             </div>
             <div className="mt-4 grid grid-cols-3 gap-3">
