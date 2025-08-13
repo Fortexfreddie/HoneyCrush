@@ -55,7 +55,7 @@ const GamePage = () => {
             <div className="flex items-center gap-4">
               <div className="w-16 h-16 rounded-xl backdrop-blur-md border border-white/20 overflow-hidden">
                 <img
-                  src={NeonBee}
+                  src={profile?.info?.pfp || NeonBee}
                   alt="User Avatar"
                   className="w-full h-full object-cover object-center"
                 />
