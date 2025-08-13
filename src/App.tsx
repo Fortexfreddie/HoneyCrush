@@ -11,6 +11,7 @@ import Users from "./components/Admin/Users";
 import Settings from "./components/Admin/Settings";
 import Maintenance from "./pages/Maintenance";
 import ProtectedRoute from "./components/ProtectedRoute";
+import Rewards from "./components/Admin/Rewards";
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
         <Route path="/admin" element={<Admin />}>
           <Route index element={<AdminDashboard />} />
           <Route path="/admin/users" element={<Users />} />
+          <Route path="/admin/rewards" element={<Rewards />} />
           <Route path="/admin/settings" element={<Settings />} />
         </Route>
         <Route path="*" element={<NotFoundPage />} />

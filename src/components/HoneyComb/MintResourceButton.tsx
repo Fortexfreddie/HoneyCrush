@@ -42,7 +42,7 @@ const MintResourceButton = () => {
 
     return (
         <form onSubmit={handleMint}>
-            <div className="grid grid-cols-2 place-items-center gap-2">
+            <div className="grid grid-cols-2 gap-2">
                 <div>
                     <label className="text-sm font-semibold">user's address</label>
                     <input

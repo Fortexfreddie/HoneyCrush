@@ -16,9 +16,7 @@ import DelegateForm from "../HoneyComb/DelegateForm";
 import ProjectDriverForm from "../HoneyComb/ProjectDriverForm";
 import CreateProfilesTreeButton from "../HoneyComb/CreateProfilesTreeButton";
 import CreateNectarResourceButton from "../HoneyComb/CreateNectarResourceButton";
-import MintResourceButton from "../HoneyComb/MintResourceButton";
 import CreateResourseTreeButton from "../HoneyComb/CreateResourseTreeButton";
-import TransferResourceButton from "../HoneyComb/TransferResourceButton";
 
 
 const Settings = () => {
@@ -137,24 +135,6 @@ const Settings = () => {
             Create the Merkle tree for the nectar Resource
           </p>
           <CreateResourseTreeButton />
-        </div>
-        <div className="flex flex-col justify-between p-4 md:p-5 space-y-4 bg-white/45 dark:bg-black/35 backdrop-blur-md rounded-2xl border border-white/35 dark:border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
-          <h2 className="font-bold flex items-center gap-2">
-            <Plus className="w-4 h-4 text-[#D4AA7D]" /> Mint Resource
-          </h2>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            Mint Nectar Resource for a user (to the address)
-          </p>
-          <MintResourceButton />
-        </div>
-        <div className="flex flex-col justify-between p-4 md:p-5 space-y-4 bg-white/45 dark:bg-black/35 backdrop-blur-md rounded-2xl border border-white/35 dark:border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
-          <h2 className="font-bold flex items-center gap-2">
-            <Plus className="w-4 h-4 text-[#D4AA7D]" /> Transfer Resource
-          </h2>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            Transfer Nectar Resource for a user to another (via address)
-          </p>
-          <TransferResourceButton />
         </div>
         <div className="flex flex-col justify-between p-4 md:p-5 space-y-4 bg-white/45 dark:bg-black/35 backdrop-blur-md rounded-2xl border border-white/35 dark:border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
           <h2 className="font-bold flex items-center gap-2">
