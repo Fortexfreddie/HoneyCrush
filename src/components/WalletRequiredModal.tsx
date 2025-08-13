@@ -1,9 +1,17 @@
 import { useWalletRequiredModal } from "../contexts/WalletRequiredModalContext";
 import { Wallet, Coins, Trophy, Shield } from "lucide-react"
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
+import Button from "./UI/Button";
+import { useRef } from "react";
 
 const WalletRequiredModal = () => {
     const {isOpen, setIsOpen} = useWalletRequiredModal();
+    const walletMultiButtonWrapperRef = useRef<HTMLDivElement>(null);
+
+    const handleClick = () => {
+        const btn = walletMultiButtonWrapperRef.current?.querySelector('button');
+        if (btn) btn.click();
+    };
 
     return (  
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -50,13 +58,16 @@ const WalletRequiredModal = () => {
                             </div>
                         </div>
                         <div className="space-y-3">
-                            <button className="w-full"><WalletMultiButton /></button>
+                            <Button onClick={handleClick} className="w-full bg-[#D4AA7D] hover:bg-[#EFD09E] text-black/90">Connect Wallet</Button>
+                            <div ref={walletMultiButtonWrapperRef} style={{ display: 'none' }}>
+                                <WalletMultiButton />
+                            </div>
 
-                            <button
+                            <Button
                                 onClick={() => setIsOpen(false)}
-                                className="w-full rounded-md bg-[#D4AA7D] hover:bg-[#EFD09E] py-2 text-sm text-gray-950 font-semibold transition-colors cursor-pointer">
+                                className="w-full text-sm border border-[#D4AA7D]/20 hover:border-[#D4AA7D]/40">
                                 Maybe later
-                            </button>
+                            </Button>
                         </div>
                     </div>
                 </div>
