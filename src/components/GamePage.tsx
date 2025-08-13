@@ -96,8 +96,8 @@ const GamePage = () => {
     <div className="px-4 py-8 md:py-12">
       <div className="flex flex-col md:flex-row gap-6">
         {/* Left Panel */}
-        <div className="md:w-4/6 flex flex-col gap-4 order-1 lg:order-1">
-          <div className="p-5 rounded-2xl order-1 lg:order-2 bg-white/45 dark:bg-black/35 border border-white/35 dark:border-white/10 backdrop-blur-md shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
+        <div className="md:w-4/6 flex flex-col gap-4">
+          <div className="p-5 rounded-2xl order-2 lg:order-2 bg-white/45 dark:bg-black/35 border border-white/35 dark:border-white/10 backdrop-blur-md shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
             <div className="flex items-center gap-4">
               <div className="w-16 h-16 rounded-xl backdrop-blur-md border border-white/20 overflow-hidden">
                 <img
@@ -134,7 +134,7 @@ const GamePage = () => {
               </div>
             </div>
           </div>
-          <div className="p-5 rounded-2xl order-1 lg:order-2 bg-white/45 dark:bg-black/35 border border-white/35 dark:border-white/10 backdrop-blur-md shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
+          <div className="p-5 rounded-2xl order-3 lg:order-2 bg-white/45 dark:bg-black/35 border border-white/35 dark:border-white/10 backdrop-blur-md shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
             <h2 className="text-xl font-bold">Stats</h2>
             <div className="mt-4 grid grid-cols-3 gap-3">
               <div className="p-3 flex flex-col text-center rounded-xl bg-white/5 backdrop-blur-sm border border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
@@ -176,7 +176,7 @@ const GamePage = () => {
               </Button>
             </div>
           </div>
-          <div className="p-5 rounded-2xl order-3 lg:order-3 bg-white/45 dark:bg-black/35 border border-white/35 dark:border-white/10 backdrop-blur-md shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
+          <div className="p-5 rounded-2xl order-1 lg:order-3 bg-white/45 dark:bg-black/35 border border-white/35 dark:border-white/10 backdrop-blur-md shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
             <h3 className="text-lg font-bold">Power-Ups</h3>
             <ul className="mt-3 space-y-2 text-sm text-gray-800/90 dark:text-gray-200/90">
               <li>- Row Blaster (clear a row)</li>
@@ -187,7 +187,7 @@ const GamePage = () => {
         </div>
 
         {/* Right Panel */}
-        <div className="flex-1 flex flex-col gap-4 order-1 lg:order-2">
+        <div className="flex-1 flex flex-col gap-4">
           <div className="p-5 flex flex-wrap items-center justify-between gap-3 bg-white/45 dark:bg-black/35 backdrop-blur-md rounded-2xl border border-white/35 dark:border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
             {/* <div className="flex items-center gap-3">
               <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/40 dark:bg-black/30 backdrop-blur-md border border-white/20">
