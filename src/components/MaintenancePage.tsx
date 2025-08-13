@@ -11,7 +11,7 @@ const MaintenancePage = () => {
                 <div className="max-w-2xl mx-auto text-center">
                     <div className="p-8 md:p-12 rounded-2xl bg-white/45 dark:bg-black/35 border border-white/35 dark:border-white/10 backdrop-blur-md shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
                         <div className="inline-flex items-center justify-center w-20 h-20 mb-6">
-                            <span className="p-4 rounded-full ring-2 ring-[#D4AA7D]/70 backdrop-blur-md shadow-[0_10px_30px_rgba(0,0,0,0.15)]"><Wrench className="w-10 h-10 text-[#D4AA7D]" /></span>
+                            <span className="p-4 rounded-full ring-2 ring-[#D4AA7D]/70 backdrop-blur-md shadow-[0_0_12px_rgba(212,170,125,0.35),0_0_30px_rgba(239,208,158,0.25)]"><Wrench className="w-10 h-10 text-[#D4AA7D]" /></span>
                         </div>
                         <h1 className="text-4xl md:text-5xl font-extrabold mb-4 leading-tight text-shadow-[0_0_12px_rgba(212,170,125,0.35),0_0_30px_rgba(239,208,158,0.25)]">Under Maintenance</h1>
                         <p className="text-lg md:text-xl mb-8">

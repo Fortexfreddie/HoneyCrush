@@ -10,6 +10,7 @@ import AdminDashboard from "./components/Admin/AdminDashboard";
 import Users from "./components/Admin/Users";
 import Settings from "./components/Admin/Settings";
 import Maintenance from "./pages/Maintenance";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
@@ -19,7 +20,11 @@ function App() {
           <Route index path="/dashboard" element={<Dashboard />} />
         </Route>
         <Route path="/missions" element={<Missions />} />
-        <Route path="/game" element={<Game />} />
+        <Route path="/game" element={
+          <ProtectedRoute>
+            <Game />
+          </ProtectedRoute>
+        } />
         <Route path="/tutorial" element={<Tutorial />} />
         <Route path="/maintenance" element={<Maintenance />} />
         <Route path="/admin" element={<Admin />}>
