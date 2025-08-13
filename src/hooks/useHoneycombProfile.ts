@@ -128,13 +128,13 @@ export async function createOrFetchProfile(
 export function getLevelProgress(totalXp?: number | null) {
   const xp = Math.max(0, Number(totalXp ?? 0));
   let level = 0;
-  let requirement = 100; // XP to go from level 0 -> 1
+  let requirement = 5000; // XP to go from level 0 -> 1
   let remaining = xp;
 
   while (remaining >= requirement) {
     remaining -= requirement;
     level += 1;
-    requirement = Math.floor(requirement * 1.25);
+    requirement = Math.floor(requirement * 1.75);
   }
 
   const progress = requirement > 0 ? remaining / requirement : 0;
@@ -189,7 +189,7 @@ export async function createNectarResource(
   await sendClientTransactions(
     client,
     wallet,
-    createCreateNewResourceTransaction
+    createCreateNewResourceTransaction()
   );
 
   // If available in response, return the resource address

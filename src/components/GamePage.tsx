@@ -1,13 +1,13 @@
 import Button from "./UI/Button";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { User } from "lucide-react";
 import NeonBee from "../assets/neon-bee-avatar-rare.png";
 import { useGameLogic } from "../hooks/useGameLogic";
 import {
   type Profile,
   createOrFetchProfile,
-  getLevelProgress,
   addXpToProfile,
+  getLevelProgress,
 } from "../hooks/useHoneycombProfile";
 import { useWallet } from "@solana/wallet-adapter-react";
 
@@ -49,30 +49,47 @@ const GamePage = () => {
   const currentScore = score.reduce((sum, val) => sum + val, 0);
   const level = getLevelProgress(profile?.platformData?.xp);
 
-  // End Game handler that also awards XP on-chain and refreshes the profile
-  // - Computes XP from the round's score (simple formula: score/5, min 1)
-  // - Calls the original endTheGame to finalize the run
-  // - If wallet/profile available, writes XP via Honeycomb and re-fetches the profile
-  const handleEndGame = async () => {
-    const roundScore = currentScore; // snapshot before endTheGame resets state
+  // Award XP when a round finishes (timer reaches 0) by tracking total's increase
+  // We compute delta tiles cleared from the change in total and apply the same XP formula.
+  const prevTotalRef = useRef<number>(total);
+  useEffect(() => {
+    const prev = prevTotalRef.current;
+    if (total > prev) {
+      const tilesCleared = total - prev; // round delta
+      // XP formula: 5–10 XP per approx 3-tile match, with board multiplier
+      const approxMatches = Math.floor(tilesCleared / 3);
+      const perMatchXp = Math.min(10, 5 + Math.floor(tilesCleared / 30));
+      const boardMultiplier = boardSize === 36 ? 1.5 : 1.0;
+      const earnedXp = Math.max(1, Math.floor(approxMatches * perMatchXp * boardMultiplier));
 
-    // Finish the game (locks interactions and resets scores/timer)
-    endTheGame();
-
-    // Only update XP when the wallet is connected and we have a profile address
-    if (!wallet.connected || !wallet.publicKey || !profile?.address) return;
-
-    // Simple XP formula; adjust as needed
-    const earnedXp = Math.max(1, Math.floor(roundScore / 5));
-
-    try {
-      await addXpToProfile(wallet, profile.address, earnedXp);
-      // Re-fetch the profile so the progress bar reflects on-chain XP
-      const updated = await createOrFetchProfile(wallet);
-      setProfile(updated);
-    } catch (e) {
-      console.error("Failed to update XP:", e);
+      if (!wallet.connected || !wallet.publicKey || !profile?.address) {
+        console.warn("[XP] Skipping XP update on timer end: wallet/profile unavailable", {
+          connected: wallet.connected,
+          hasPubkey: !!wallet.publicKey,
+          hasProfile: !!profile?.address,
+        });
+      } else {
+        const prevXp = profile?.platformData?.xp ?? 0;
+        console.log("[XP] Timer-end XP", { tilesCleared, approxMatches, perMatchXp, boardMultiplier, earnedXp, prevXp });
+        (async () => {
+          try {
+            await addXpToProfile(wallet, profile.address!, earnedXp);
+            const updated = await createOrFetchProfile(wallet);
+            const newXp = updated?.platformData?.xp ?? 0;
+            console.log("[XP] Profile XP updated", { prevXp, newXp, delta: newXp - prevXp });
+            setProfile(updated);
+          } catch (e) {
+            console.error("[XP] Failed to update XP on timer end:", e);
+          }
+        })();
+      }
     }
+    prevTotalRef.current = total;
+  }, [total]);
+
+  // End Game now just resets the timer by starting a new round
+  const handleEndGame = () => {
+    endTheGame()
   };
 
   return (
@@ -91,15 +108,7 @@ const GamePage = () => {
               </div>
               <div className="flex flex-col">
                 <span className="text-xl font-bold">{profile?.info?.name || "Player"}</span>
-                <div className="flex items-center gap-2">
-                  <span className="text-sm">Level {level.level}</span>
-                  <div className="w-40 h-2 rounded-full bg-black/10 dark:bg-white/10 overflow-hidden mt-1">
-                    <div
-                      className="h-full bg-[#D4AA7D] transition-all duration-300"
-                      style={{ width: `${Math.round(level.progress * 100)}%` }}
-                    />
-                  </div>
-                </div>
+                <span className="text-sm">Level {level.level}</span>
               </div>
             </div>
             <div className="mt-4 grid grid-cols-3 gap-3">
@@ -112,7 +121,7 @@ const GamePage = () => {
               <div className="p-3 flex flex-col text-center rounded-xl bg-white/5 backdrop-blur-sm border border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
                 <span className="text-xs uppercase opacity-80">Xp</span>
                 <span className="text-2xl font-extrabold dark:text-[#EFD09E]">
-                  320
+                  {profile?.platformData?.xp ?? 0}
                 </span>
               </div>
               <div className="p-3 flex flex-col text-center rounded-xl bg-white/5 backdrop-blur-sm border border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
