@@ -12,7 +12,7 @@ const Rewards = () => {
                 <Gift className="w-4 h-4 text-[#D4AA7D]" /> Balances
             </h2>
             <div className="space-y-2">
-                <div className="flex items-center justify-between rounded-xl bg-white/40 dark:bg-black/30 border border-white/20 px-3 py-2">
+                <div className="flex items-center justify-between rounded-xl bg-white/40 dark:bg-black/30 border border-white/20 px-3 py-2 shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
                     <span className="text-sm opacity-80">Nectar</span>
                     <span className="font-extrabold">1,240,000</span>
                 </div>

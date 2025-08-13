@@ -29,7 +29,7 @@ const AdminDashboard = () => {
       <h1 className="text-2xl md:text-3xl font-extrabold">
         Dashboard Overview
       </h1>
-      <div className="mt-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+      <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
         {stats.map((stat, index) => (
           <section
             key={index}
