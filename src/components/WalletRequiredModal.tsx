@@ -65,7 +65,7 @@ const WalletRequiredModal = () => {
 
                             <Button
                                 onClick={() => setIsOpen(false)}
-                                className="w-full text-sm border border-[#D4AA7D]/20 hover:border-[#D4AA7D]/40">
+                                className="w-full bg-[#D4AA7D] dark:bg-transparent text-sm border border-[#D4AA7D]/20 hover:border-[#D4AA7D]/40">
                                 Maybe later
                             </Button>
                         </div>
