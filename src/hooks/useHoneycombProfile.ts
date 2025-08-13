@@ -1,6 +1,7 @@
 import { client } from "../lib/honeycombClient";
 import { sendClientTransactions } from "@honeycomb-protocol/edge-client/client/walletHelpers";
 import type { WalletContextState } from "@solana/wallet-adapter-react";
+import { ResourceStorageEnum } from "@honeycomb-protocol/edge-client";
 
 export interface Profile {
     address?: string;
@@ -138,4 +139,56 @@ export function getLevelProgress(totalXp?: number | null) {
     required: requirement, // xp required to reach next level
     progress,   // 0..1
   };
+}
+
+/**
+ * Create the Nectar resource as a project Resource on Honeycomb.
+ * Reusable function that takes the wallet context like other helpers in this module.
+ * Returns the created resource address if available from the response.
+ */
+export async function createNectarResource(
+  wallet: WalletContextState,
+  resourceMetaUri: string = "https://example.com/nectar.json"
+): Promise<string | undefined> {
+  if (!wallet.publicKey) throw new Error("Wallet not connected");
+
+  const payer = wallet.publicKey.toBase58();
+  const project =
+    (typeof window !== "undefined" && window.localStorage.getItem("honeycomb_project")) ||
+    (import.meta as any)?.env?.VITE_HONEYCOMB_PROJECT_ID;
+  if (!project) throw new Error("Project ID not configured");
+
+  const { createCreateNewResourceTransaction } =
+    await client.createCreateNewResourceTransaction({
+      authority: payer,
+      payer,
+      project,
+      params: {
+        name: "Nectar",
+        symbol: "NECT",
+        decimals: 9,
+        storage: ResourceStorageEnum.LedgerState,
+        uri: resourceMetaUri,
+        tags: ["game", "currency"],
+      },
+    });
+
+  await sendClientTransactions(
+    client,
+    wallet,
+    createCreateNewResourceTransaction.tx ?? createCreateNewResourceTransaction
+  );
+
+  // Return the resource address if provided by the API
+  return (createCreateNewResourceTransaction as any)?.resource;
+}
+
+export async function mintNectar(resource: string, wallet: WalletContextState): Promise<string | undefined>{
+  if (!wallet.publicKey) throw new Error("Wallet not connected");
+    const payer = wallet.publicKey.toBase58()
+
+  const {createMintResourceTransaction :txResponse} = await client.createMintResourceTransaction({
+    amount: '500',
+    authority: payer,
+  })
 }
