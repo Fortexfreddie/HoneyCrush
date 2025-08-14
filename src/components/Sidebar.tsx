@@ -21,7 +21,7 @@ const Sidebar = () => {
             <ul className="flex flex-col gap-4">
                 {
                     navs.map((nav, index) => (
-                        <li key={index} onClick={() => navigate(nav.href)} className="flex items-center gap-2 hover:bg-[#D4AA7D]/20 rounded-xl px-4 py-2 cursor-pointer">
+                        <li key={index} onClick={() => {navigate(nav.href); setSidebarOpen(false)}} className="flex items-center gap-2 hover:bg-[#D4AA7D]/20 rounded-xl px-4 py-2 cursor-pointer">
                             {nav.icon}
                             <span className="text-sm text-gray-800/90 dark:text-gray-200/90 font-semibold">{nav.title}</span>
                         </li>
