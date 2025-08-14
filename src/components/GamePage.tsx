@@ -1,4 +1,4 @@
-import {Button} from "./UI/Button";
+import { Button } from "./UI/Button";
 import { useEffect, useState, useRef } from "react";
 import { User } from "lucide-react";
 import NeonBee from "../assets/neon-bee-avatar-rare.png";
@@ -10,10 +10,11 @@ import {
   getLevelProgress,
 } from "../hooks/useHoneycombProfile";
 import { useWallet } from "@solana/wallet-adapter-react";
-
+import { fetchCharacters, type Character } from "../hooks/useCharacter";
 const GamePage = () => {
   const wallet = useWallet();
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [character, setCharacter] = useState<Character[]>([]);
 
   useEffect(() => {
     if (wallet.connected && wallet.publicKey) {
@@ -22,6 +23,9 @@ const GamePage = () => {
         .catch((err) => {
           console.error("Profile error:", err);
         });
+      fetchCharacters(wallet)
+        .then((characterData) => setCharacter(characterData))
+        .catch((err) => console.error("failed to fetch", err));
     }
   }, [wallet, wallet.connected, wallet.publicKey]);
 
@@ -60,23 +64,40 @@ const GamePage = () => {
       const approxMatches = Math.floor(tilesCleared / 3);
       const perMatchXp = Math.min(10, 5 + Math.floor(tilesCleared / 30));
       const boardMultiplier = boardSize === 36 ? 1.5 : 1.0;
-      const earnedXp = Math.max(1, Math.floor(approxMatches * perMatchXp * boardMultiplier));
+      const earnedXp = Math.max(
+        1,
+        Math.floor(approxMatches * perMatchXp * boardMultiplier)
+      );
 
       if (!wallet.connected || !wallet.publicKey || !profile?.address) {
-        console.warn("[XP] Skipping XP update on timer end: wallet/profile unavailable", {
-          connected: wallet.connected,
-          hasPubkey: !!wallet.publicKey,
-          hasProfile: !!profile?.address,
-        });
+        console.warn(
+          "[XP] Skipping XP update on timer end: wallet/profile unavailable",
+          {
+            connected: wallet.connected,
+            hasPubkey: !!wallet.publicKey,
+            hasProfile: !!profile?.address,
+          }
+        );
       } else {
         const prevXp = profile?.platformData?.xp ?? 0;
-        console.log("[XP] Timer-end XP", { tilesCleared, approxMatches, perMatchXp, boardMultiplier, earnedXp, prevXp });
+        console.log("[XP] Timer-end XP", {
+          tilesCleared,
+          approxMatches,
+          perMatchXp,
+          boardMultiplier,
+          earnedXp,
+          prevXp,
+        });
         (async () => {
           try {
             await addXpToProfile(wallet, profile.address!, earnedXp);
             const updated = await createOrFetchProfile(wallet);
             const newXp = updated?.platformData?.xp ?? 0;
-            console.log("[XP] Profile XP updated", { prevXp, newXp, delta: newXp - prevXp });
+            console.log("[XP] Profile XP updated", {
+              prevXp,
+              newXp,
+              delta: newXp - prevXp,
+            });
             setProfile(updated);
           } catch (e) {
             console.error("[XP] Failed to update XP on timer end:", e);
@@ -89,7 +110,7 @@ const GamePage = () => {
 
   // End Game now just resets the timer by starting a new round
   const handleEndGame = () => {
-    endTheGame()
+    endTheGame();
   };
 
   return (
@@ -107,7 +128,9 @@ const GamePage = () => {
                 />
               </div>
               <div className="flex flex-col">
-                <span className="text-xl font-bold">{profile?.info?.name || "Player"}</span>
+                <span className="text-xl font-bold">
+                  {profile?.info?.name || "Player"}
+                </span>
                 <span className="text-sm">Level {level.level}</span>
               </div>
             </div>
@@ -241,7 +264,7 @@ const GamePage = () => {
               </div>
               <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
                 <User className="w-4 h-4 text-[#D4AA7D]" />
-                <span className="text-sm">NFT: Cyber Bee v1</span>
+                <span className="text-sm">NFT: Cyber Bee v1 {character.length}</span>
               </div>
             </div>
           </div>
