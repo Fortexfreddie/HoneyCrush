@@ -1,6 +1,5 @@
 import { Button } from "./UI/Button";
 import { useEffect, useState, useRef } from "react";
-import { User } from "lucide-react";
 import NeonBee from "../assets/neon-bee-avatar-rare.png";
 import { useGameLogic } from "../hooks/useGameLogic";
 import {
@@ -16,7 +15,6 @@ const GamePage = () => {
   const wallet = useWallet();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [characters, setCharacters] = useState<Character[]>([]);
-
   useEffect(() => {
     if (wallet.connected && wallet.publicKey) {
       createOrFetchProfile(wallet)

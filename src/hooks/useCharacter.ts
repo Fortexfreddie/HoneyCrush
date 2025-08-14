@@ -1,6 +1,6 @@
 import type { WalletContextState } from "@solana/wallet-adapter-react";
 import { client } from "../lib/honeycombClient";
-
+import { sendClientTransactions } from "@honeycomb-protocol/edge-client/client/walletHelpers";
 // CharacterSourceKind, SourceKind, AssetCriteriaKind would ideally be imported
 // from your GraphQL types or manually typed as enums.
 type CharacterSourceKind = string;
@@ -127,9 +127,13 @@ export interface Character {
  * - Prefers Assembled source.params.uri
  * - Falls back to common asset metadata locations
  */
-export function getCharacterImageUri(character: Character | undefined | null): string | undefined {
+export function getCharacterImageUri(
+  character: Character | undefined | null
+): string | undefined {
   if (!character) return undefined;
-  const params = (character.source?.params ?? {}) as Partial<AssembledSource & WrappedSource>;
+  const params = (character.source?.params ?? {}) as Partial<
+    AssembledSource & WrappedSource
+  >;
   const uriFromSource = (params as Partial<AssembledSource>)?.uri;
 
   // Common places URIs live depending on backend metadata
@@ -140,7 +144,34 @@ export function getCharacterImageUri(character: Character | undefined | null): s
   return uriFromSource || uriFromAssetFiles || uriFromJson;
 }
 
-export async function fetchCharacters(wallet: WalletContextState): Promise<Character[]> {
+export async function equipResourceToCharacters(wallet: WalletContextState) {
+  const characterModelAddress = import.meta.env.VITE_CHARACTER_MODEL_ADDY;
+  const characterAddress = import.meta.env.VITE_CHARACTER_ADDY;
+  const resourceAddress = import.meta.env.VITE_NECTAR_RESOURCE_ADDY;
+  const walletString = wallet?.publicKey?.toString();
+  try {
+    const { createEquipResourceOnCharacterTransaction } =
+      await client.createEquipResourceOnCharacterTransaction({
+        characterModel: characterModelAddress.toString(), // The address of the character model
+        characterAddress: characterAddress.toString(), // The character the resource is being equipped to
+        resource: resourceAddress.toString(), // The address of the resource being equipped
+        owner: walletString, // The public key of the owner
+        amount: "5",
+      });
+    await sendClientTransactions(
+      client,
+      walletString,
+      createEquipResourceOnCharacterTransaction
+    );
+    console.log(createEquipResourceOnCharacterTransaction);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+export async function fetchCharacters(
+  wallet: WalletContextState
+): Promise<Character[]> {
   try {
     if (!wallet?.publicKey) return [];
     const walletStr = wallet.publicKey.toBase58();
