@@ -7,7 +7,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { useRef } from "react";
-import Button from "./UI/Button";
+import {Button, DashboardButton} from "./UI/Button";
 import { useNavigate } from "react-router-dom";
 import neonbee from "../assets/neon-bee-avatar-rare.png";
 
@@ -54,22 +54,22 @@ const Dashboard = () => {
             and collect on-chain rewards.
           </p>
           <div className="mt-6 flex flex-col sm:flex-row gap-3">
-            <Button
+            <DashboardButton
               onClick={() => navigate("/game")}
-              className="w-full sm:w-auto bg-[#D4AA7D] hover:bg-[#EFD09E] text-black"
+              className="w-full sm:w-auto bg-[#D4AA7D]  text-black"
             >
               Start Playing
-            </Button>
-            <Button
+            </DashboardButton>
+            <DashboardButton
               onClick={() => navigate("/tutorial")}
-              className="w-full sm:w-auto bg-transparent border-2 border-[#D4AA7D] text-[#D4AA7D] hover:bg-[#D4AA7D] hover:text-black"
+              className="w-full sm:w-auto bg-transparent border-2 border-[#D4AA7D] text-[#D4AA7D]  hover:text-black"
             >
               Learn How It Works
-            </Button>
-            <Button className="w-full sm:w-auto bg-white/20 dark:bg-white/10 text-black dark:text-white hover:bg-white/30 dark:hover:bg-white/20">
+            </DashboardButton>
+            <DashboardButton className="w-full sm:w-auto bg-white/20 dark:bg-white/10 text-black dark:text-white hover:bg-white/30 dark:hover:bg-white/20">
               <Wallet className="w-4 h-4 mr-2" />
               Connect Wallet
-            </Button>
+            </DashboardButton>
           </div>
           <div className="mt-4 flex items-center text-sm text-gray-700/80 dark:text-gray-300/80">
             <Info className="w-4 h-4 mr-2" />

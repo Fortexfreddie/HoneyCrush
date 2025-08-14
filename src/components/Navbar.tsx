@@ -1,13 +1,11 @@
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Sun, Moon } from "lucide-react";
-import Button from "./UI/Button";
+import {Button} from "./UI/Button";
 import NavLink from "./UI/NavLink";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
-import { useWallet } from "@solana/wallet-adapter-react";
 
 const Header = () => {
-  const wallet = useWallet();
   const [isDarkMode, setIsDarkMode] = useState(() => {
     const storedTheme = localStorage.getItem("theme");
     return storedTheme ? storedTheme === "dark" : true; // default to dark
@@ -67,7 +65,7 @@ const Header = () => {
         <div className="flex items-center gap-2">
           <Button
             onClick={toggleTheme}
-            className={`bg-white/40 dark:bg-black/30 backdrop-blur-md border border-white/20 hover:border-black/40 dark:hover:border-white/40 ${
+            className={`rounded-full p-2 bg-white/40 dark:bg-black/30 backdrop-blur-md border border-white/20 hover:border-black/40 dark:hover:border-white/40 ${
               isDarkMode ? "rotate-180" : ""
             }`}
           >

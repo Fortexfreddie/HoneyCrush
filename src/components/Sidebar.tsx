@@ -1,5 +1,5 @@
 import { useSidebar } from "../contexts/SidebarContext";
-import Button from "./UI/Button";
+import {Button} from "./UI/Button";
 import { X, Home, Users, Puzzle, Gift, Trophy, BarChart3, Settings } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 

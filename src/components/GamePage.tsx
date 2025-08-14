@@ -1,4 +1,4 @@
-import Button from "./UI/Button";
+import {Button} from "./UI/Button";
 import { useEffect, useState, useRef } from "react";
 import { User } from "lucide-react";
 import NeonBee from "../assets/neon-bee-avatar-rare.png";

@@ -1,4 +1,4 @@
-import Button from "../UI/Button";
+import {Button} from "../UI/Button";
 import { UserCheck } from "lucide-react";
 import { useState } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";

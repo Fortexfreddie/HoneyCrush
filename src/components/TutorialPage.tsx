@@ -1,5 +1,5 @@
 import { Puzzle, Wallet, Gamepad2, Sparkles, Trophy, Shield } from "lucide-react";
-import Button from "./UI/Button";
+import {Button} from "./UI/Button";
 import { useNavigate } from "react-router-dom";
 import TutorialCard from "./UI/TutorialCard";
 

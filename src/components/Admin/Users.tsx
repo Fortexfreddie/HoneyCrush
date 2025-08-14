@@ -1,5 +1,5 @@
 import { Search, Ban, UserCheck } from "lucide-react";
-import Button from "../UI/Button";
+import {Button} from "../UI/Button";
 
 
 const users = [

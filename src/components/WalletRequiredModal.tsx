@@ -1,7 +1,7 @@
 import { useWalletRequiredModal } from "../contexts/WalletRequiredModalContext";
 import { Wallet, Coins, Trophy, Shield } from "lucide-react"
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
-import Button from "./UI/Button";
+import {Button} from "./UI/Button";
 import { useRef } from "react";
 
 const WalletRequiredModal = () => {

@@ -3,7 +3,7 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import { client } from "../../lib/honeycombClient";
 import { sendClientTransactions } from "@honeycomb-protocol/edge-client/client/walletHelpers";
 import { Send } from "lucide-react";
-import Button from "../UI/Button";
+import {Button} from "../UI/Button";
 
 const TransferResource = () => {
     const wallet = useWallet();

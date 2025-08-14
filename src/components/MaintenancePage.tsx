@@ -1,5 +1,5 @@
 import { Wrench, Clock, ArrowLeft, Zap } from "lucide-react";
-import Button from "./UI/Button";
+import {Button} from "./UI/Button";
 import { useNavigate } from "react-router-dom";
 
 const MaintenancePage = () => {
