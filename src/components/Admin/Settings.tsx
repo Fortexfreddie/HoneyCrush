@@ -20,6 +20,7 @@ import CreateResourseTreeButton from "../HoneyComb/CreateResourseTreeButton";
 import CreateAssemblerConfigButton from "../HoneyComb/CreateAssemblerConfigButton";
 import CreateCharacterModelButton from "../HoneyComb/CreateCharacterModelButton";
 import CreateCharactersTreeButton from "../HoneyComb/CreateCharactersTreeButton";
+import MintCharacterButton from "../HoneyComb/MintCharacterButton";
 
 
 const Settings = () => {
@@ -165,6 +166,15 @@ const Settings = () => {
             Create character tree that stores all characters and their ownership.
           </p>
           <CreateCharactersTreeButton />
+        </div>
+        <div className="flex flex-col justify-between p-4 md:p-5 space-y-4 bg-white/45 dark:bg-black/35 backdrop-blur-md rounded-2xl border border-white/35 dark:border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
+          <h2 className="font-bold flex items-center gap-2">
+            <Plus className="w-4 h-4 text-[#D4AA7D]" /> Assemble (Mint) a character
+          </h2>
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            Assemble (Mint) a character for a user, in this case ur wallet.
+          </p>
+          <MintCharacterButton />
         </div>
         <div className="flex flex-col justify-between p-4 md:p-5 space-y-4 bg-white/45 dark:bg-black/35 backdrop-blur-md rounded-2xl border border-white/35 dark:border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
           <h2 className="font-bold flex items-center gap-2">
