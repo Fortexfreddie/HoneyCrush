@@ -128,7 +128,7 @@ export async function createOrFetchProfile(
 export function getLevelProgress(totalXp?: number | null) {
   const xp = Math.max(0, Number(totalXp ?? 0));
   let level = 0;
-  let requirement = 5000; // XP to go from level 0 -> 1
+  let requirement = 500; // XP to go from level 0 -> 1
   let remaining = xp;
 
   while (remaining >= requirement) {
