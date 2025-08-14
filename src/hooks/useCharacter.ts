@@ -1,7 +1,7 @@
 import type { WalletContextState } from "@solana/wallet-adapter-react";
 import { client } from "../lib/honeycombClient";
 
-// CharacterSourceKind, SourceKind, AssetCriteriaKind would ideally be imported 
+// CharacterSourceKind, SourceKind, AssetCriteriaKind would ideally be imported
 // from your GraphQL types or manually typed as enums.
 type CharacterSourceKind = string;
 type SourceKind = string;
@@ -122,16 +122,38 @@ export interface Character {
   cooldown: CharacterCooldown;
 }
 
+/**
+ * Helper to resolve the most reliable image URI for a character.
+ * - Prefers Assembled source.params.uri
+ * - Falls back to common asset metadata locations
+ */
+export function getCharacterImageUri(character: Character | undefined | null): string | undefined {
+  if (!character) return undefined;
+  const params = (character.source?.params ?? {}) as Partial<AssembledSource & WrappedSource>;
+  const uriFromSource = (params as Partial<AssembledSource>)?.uri;
 
+  // Common places URIs live depending on backend metadata
+  const asset = character.asset as any;
+  const uriFromAssetFiles = asset?.content?.files?.[0]?.uri;
+  const uriFromJson = asset?.content?.json_uri ?? asset?.content?.json?.image;
 
-export async function fetchCharacters(
-  wallet: WalletContextState
-): Promise<Character[]> {
-  const result = await client.findCharacters({
-    wallets: wallet?.publicKey?.toBase58(),
-    includeProof: true,
-    filters: {},
-  });
+  return uriFromSource || uriFromAssetFiles || uriFromJson;
+}
 
-  return result.character;
+export async function fetchCharacters(wallet: WalletContextState): Promise<Character[]> {
+  try {
+    if (!wallet?.publicKey) return [];
+    const walletStr = wallet.publicKey.toBase58();
+
+    const result = await client.findCharacters({
+      wallets: [walletStr], // important: the API expects an array
+      includeProof: true,
+      filters: {},
+    });
+
+    return result?.character ?? [];
+  } catch (e) {
+    console.error("Failed to fetch characters:", e);
+    return [];
+  }
 }

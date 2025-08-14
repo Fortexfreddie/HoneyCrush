@@ -10,11 +10,12 @@ import {
   getLevelProgress,
 } from "../hooks/useHoneycombProfile";
 import { useWallet } from "@solana/wallet-adapter-react";
-import { fetchCharacters, type Character } from "../hooks/useCharacter";
+import { fetchCharacters, type Character, getCharacterImageUri } from "../hooks/useCharacter";
+
 const GamePage = () => {
   const wallet = useWallet();
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [character, setCharacter] = useState<Character[]>([]);
+  const [characters, setCharacters] = useState<Character[]>([]);
 
   useEffect(() => {
     if (wallet.connected && wallet.publicKey) {
@@ -23,21 +24,21 @@ const GamePage = () => {
         .catch((err) => {
           console.error("Profile error:", err);
         });
+
       fetchCharacters(wallet)
-        .then((characterData) => setCharacter(characterData))
-        .catch((err) => console.error("failed to fetch", err));
+        .then((characterData) => {
+          setCharacters(characterData ?? []);
+        })
+        .catch((err) => console.error("failed to fetch characters", err));
+    } else {
+      setCharacters([]);
     }
   }, [wallet, wallet.connected, wallet.publicKey]);
 
   const {
-    // COLORS,
     boardSize,
-    // setBoardSize,
     board,
-    // setBoard,
-    // draggedTile,
     setDraggedTile,
-    // width,
     matched,
     isResolving,
     hasStarted,
@@ -54,7 +55,6 @@ const GamePage = () => {
   const level = getLevelProgress(profile?.platformData?.xp);
 
   // Award XP when a round finishes (timer reaches 0) by tracking total's increase
-  // We compute delta tiles cleared from the change in total and apply the same XP formula.
   const prevTotalRef = useRef<number>(total);
   useEffect(() => {
     const prev = prevTotalRef.current;
@@ -112,6 +112,10 @@ const GamePage = () => {
   const handleEndGame = () => {
     endTheGame();
   };
+
+  // Resolve the first character's image to show in the header
+  const firstCharacter = characters[0];
+  const firstCharacterImage = getCharacterImageUri(firstCharacter);
 
   return (
     <div className="px-4 py-8 md:py-12">
@@ -184,9 +188,6 @@ const GamePage = () => {
               >
                 Start Game
               </Button>
-              {/* <Button className="bg-[#D4AA7D] hover:bg-[#EFD09E] text-black">
-                Pause
-              </Button> */}
               <Button
                 onClick={handleEndGame}
                 className="
@@ -212,26 +213,6 @@ const GamePage = () => {
         {/* Right Panel */}
         <div className="flex-1 flex flex-col gap-4">
           <div className="p-5 flex flex-wrap items-center justify-between gap-3 bg-white/45 dark:bg-black/35 backdrop-blur-md rounded-2xl border border-white/35 dark:border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
-            {/* <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/40 dark:bg-black/30 backdrop-blur-md border border-white/20">
-                <span className="text-xs uppercase tracking-widest opacity-70">
-                  Nectar
-                </span>
-                <span className="font-extrabold dark:text-[#D4AA7D]">150</span>
-              </div>
-              <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/40 dark:bg-black/30 backdrop-blur-md border border-white/20">
-                <span className="text-xs uppercase tracking-widest opacity-70">
-                  XP
-                </span>
-                <span className="font-extrabold dark:text-[#EFD09E]">1500</span>
-              </div>
-              <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/40 dark:bg-black/30 backdrop-blur-md border border-white/20">
-                <span className="text-xs uppercase tracking-widest opacity-70">
-                  Tokens
-                </span>
-                <span className="font-extrabold dark:text-[#9EEFD0]">3</span>
-              </div>
-            </div> */}
             <div className="flex items-center gap-3 max-w-xl mx-auto">
               <div className="flex items-center gap-2 rounded-xl px-3 py-2 bg-black/5 dark:bg-white/5">
                 <span className="text-xs uppercase tracking-wider opacity-80">
@@ -263,8 +244,16 @@ const GamePage = () => {
                 </button>
               </div>
               <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
-                <User className="w-4 h-4 text-[#D4AA7D]" />
-                <span className="text-sm">NFT: Cyber Bee v1 {character.length}</span>
+                {/* <User className="w-4 h-4 text-[#D4AA7D]" /> */}
+                 {firstCharacterImage && (
+                  <img
+                    src={firstCharacterImage}
+                    alt="Character"
+                    className="w-6 h-6 rounded-full object-cover border border-white/10"
+                  />
+                )}
+                <span className="text-sm">NFT: Cyber Bee v1</span>
+               
               </div>
             </div>
           </div>

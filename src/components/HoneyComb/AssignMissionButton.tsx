@@ -47,7 +47,6 @@ const AssignMissionButton = () => {
                     ],
                     authority: wallet.publicKey.toString(),
                     payer: wallet.publicKey.toString(), // Optional
-                    userId: userId,
                 },
             });
 

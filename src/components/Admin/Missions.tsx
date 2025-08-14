@@ -2,7 +2,7 @@ import CreateMissionPoolButton from "../HoneyComb/CreateMissionPoolButton";
 import CreateMissionButton from "../HoneyComb/CreateMissionButton";
 import AssignMissionButton from "../HoneyComb/AssignMissionButton";
 import { Trophy, Plus } from "lucide-react";
-import Button from "../UI/Button";
+import {Button} from "../UI/Button";
 
 const Missions = () => {
   return (
