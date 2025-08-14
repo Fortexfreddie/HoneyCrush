@@ -57,7 +57,13 @@ function normalizeProfile(apiProfile: any): Profile {
       custom: apiProfile.platformData?.custom ?? {},
     },
     user: apiProfile.user
-      ? { wallets: { wallets: apiProfile.user.wallets?.wallets ?? [] } }
+      ? {
+          id: apiProfile.user.id,
+          address: apiProfile.user.address,
+          wallets: { wallets: apiProfile.user.wallets?.wallets ?? [] },
+          info: apiProfile.user.info,
+          socialInfo: apiProfile.user.socialInfo,
+        }
       : undefined,
   };
 }
