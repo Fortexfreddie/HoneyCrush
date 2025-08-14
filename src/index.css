@@ -11,6 +11,7 @@ button.wallet-adapter-button-trigger {
   font-weight: bold !important;
   padding: 0.5rem 1rem !important;
   border-radius: 0.375rem !important; /* rounded-md */
+  white-space: nowrap;
 }
 
 /* Hover effect */
