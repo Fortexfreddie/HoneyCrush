@@ -51,11 +51,15 @@ const FetchCharacterButton = () => {
                         const params = character.source?.params || {};
                         const uri = params.uri;
                         const attributes = params.attributes;
+
+                        console.log(character.equipments);
+
                         return (
                             <div key={character.address} className="character-card p-4 border rounded-xl bg-white/80 dark:bg-black/30">
                                 {uri && <img src={uri} alt="Character" className="w-32 h-32 object-contain mb-2" />}
                                 <p><strong>Owner:</strong> {character.owner}</p>
                                 <p><strong>Address:</strong> {character.address}</p>
+                                <p><strong>Assets:</strong> {character.assets}</p>
                                 {attributes && (
                                     <ul className="mt-2">
                                         {Object.entries(attributes).map(([key, value]) => (

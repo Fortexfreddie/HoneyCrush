@@ -148,7 +148,12 @@ export async function equipResourceToCharacters(wallet: WalletContextState) {
   const characterModelAddress = import.meta.env.VITE_CHARACTER_MODEL_ADDY;
   const characterAddress = import.meta.env.VITE_CHARACTER_ADDY;
   const resourceAddress = import.meta.env.VITE_NECTAR_RESOURCE_ADDY;
-  const walletString = wallet?.publicKey?.toString();
+  const walletString = wallet?.publicKey?.toString() || "";
+
+  if (!characterModelAddress || !characterAddress || !resourceAddress || !walletString) {
+    throw new Error("Missing required parameters for equipResourceToCharacters");
+  }
+
   try {
     const { createEquipResourceOnCharacterTransaction } =
       await client.createEquipResourceOnCharacterTransaction({
@@ -158,14 +163,15 @@ export async function equipResourceToCharacters(wallet: WalletContextState) {
         owner: walletString, // The public key of the owner
         amount: "5",
       });
-    await sendClientTransactions(
-      client,
-      walletString,
-      createEquipResourceOnCharacterTransaction
-    );
-    console.log(createEquipResourceOnCharacterTransaction);
+    // await sendClientTransactions(
+    //   client,
+    //   walletString,
+    //   createEquipResourceOnCharacterTransaction
+    // );
+    return(createEquipResourceOnCharacterTransaction);
   } catch (error) {
     console.error(error);
+    throw error;
   }
 }
 
