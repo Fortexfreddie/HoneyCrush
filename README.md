@@ -187,7 +187,7 @@ public/
 
 ## Video Guide
 
-For a step-by-step tutorial, watch the video guide: [Insert YouTube Video URL Here]
+For a step-by-step tutorial, watch the video guide: https://youtu.be/9EueYTCRf5g
 
 ## Implementation Notes
 
