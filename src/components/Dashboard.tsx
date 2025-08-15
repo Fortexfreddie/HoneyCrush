@@ -1,7 +1,6 @@
 import {
   Sparkles,
   Gamepad2,
-  Wallet,
   Info,
   ChevronLeft,
   ChevronRight,
@@ -76,10 +75,7 @@ const Dashboard = () => {
             >
               Learn How It Works
             </DashboardButton>
-            <DashboardButton className="w-full sm:w-auto border-1 bg-white/20 dark:bg-white/10 text-black dark:text-white hover:bg-white/30 dark:hover:bg-white/20">
-              <Wallet className="w-4 h-4 mr-2" />
-              Connect Wallet
-            </DashboardButton>
+        
           </div>
           <div className="mt-4 flex items-center text-sm text-gray-700/80 dark:text-gray-300/80">
             <Info className="w-4 h-4 mr-2" />

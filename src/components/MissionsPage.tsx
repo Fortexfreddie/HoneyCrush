@@ -70,7 +70,7 @@ export default function MissionsPage() {
     createOrFetchProfile(wallet)
       .then((p) => setProfile(p))
       .catch((e) => console.error("[Missions] Failed to fetch profile", e));
-  }, [wallet.connected, wallet.publicKey]);
+  }, [wallet, wallet.connected, wallet.publicKey]);
 
   // Poll profile periodically so progress updates after rounds
   useEffect(() => {
@@ -79,7 +79,7 @@ export default function MissionsPage() {
       createOrFetchProfile(wallet).then((p) => setProfile(p)).catch(() => {});
     }, 5000);
     return () => clearInterval(id);
-  }, [wallet.connected, wallet.publicKey]);
+  }, [wallet, wallet.connected, wallet.publicKey]);
 
   // Initialize or load missions
   useEffect(() => {
@@ -112,7 +112,7 @@ export default function MissionsPage() {
       return;
     }
     setMissionsState(parsed);
-  }, [profile?.address, profile?.platformData?.custom?.missionsState]);
+  }, [profile?.address, profile?.platformData?.custom, profile?.platformData?.custom?.missionsState, wallet]);
 
   // Compute mission views
   const annotated = useMemo(() => {
