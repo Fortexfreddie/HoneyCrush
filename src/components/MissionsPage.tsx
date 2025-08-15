@@ -6,7 +6,7 @@ import {
   createOrFetchProfile,
   type Profile,
   addXpToProfile,
-  setTotalScoreOnProfile,
+  // setTotalScoreOnProfile,
 } from "../hooks/useHoneycombProfile";
 
 // Mission shape (no time-based fields)
@@ -97,18 +97,18 @@ export default function MissionsPage() {
       const state: MissionsState = { missions };
       setMissionsState(state);
       // Persist initial missions state
-      const preservedTotal = Number(custom.totalScore ?? 0);
-      setTotalScoreOnProfile(
-        wallet,
-        profile.address,
-        preservedTotal,
-        { ...custom, missionsState: JSON.stringify(state) }
-      )
-        .then(async () => {
-          const updated = await createOrFetchProfile(wallet);
-          setProfile(updated);
-        })
-        .catch((e) => console.error("[Missions] Persist state failed", e));
+      // const preservedTotal = Number(custom.totalScore ?? 0);
+      // setTotalScoreOnProfile(
+      //   wallet,
+      //   profile.address,
+      //   preservedTotal,
+      //   { ...custom, missionsState: JSON.stringify(state) }
+      // )
+      //   .then(async () => {
+      //     const updated = await createOrFetchProfile(wallet);
+      //     setProfile(updated);
+      //   })
+      //   .catch((e) => console.error("[Missions] Persist state failed", e));
       return;
     }
     setMissionsState(parsed);
@@ -132,15 +132,15 @@ export default function MissionsPage() {
 
   async function persistMissions(next: MissionsState) {
     if (!profile?.address || !wallet.connected || !wallet.publicKey) return;
-    const custom = profile.platformData?.custom ?? {};
-    const preservedTotal = Number(custom.totalScore ?? 0);
+    // const custom = profile.platformData?.custom ?? {};
+    // const preservedTotal = Number(custom.totalScore ?? 0);
     try {
-      await setTotalScoreOnProfile(
-        wallet,
-        profile.address,
-        preservedTotal,
-        { ...custom, missionsState: JSON.stringify(next) }
-      );
+      // await setTotalScoreOnProfile(
+      //   wallet,
+      //   profile.address,
+      //   preservedTotal,
+      //   { ...custom, missionsState: JSON.stringify(next) }
+      // );
       const updated = await createOrFetchProfile(wallet);
       setProfile(updated);
       setMissionsState(next);

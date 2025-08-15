@@ -7,7 +7,7 @@ import {
   createOrFetchProfile,
   addXpToProfile,
   getLevelProgress,
-  setTotalScoreOnProfile,
+  // setTotalScoreOnProfile,
 } from "../hooks/useHoneycombProfile";
 import { useWallet } from "@solana/wallet-adapter-react";
 import {
@@ -156,12 +156,12 @@ const GamePage = () => {
             baseCustom.lastMatchAt = String(nowTs);
             baseCustom.matchesPlayedTimestamps = JSON.stringify(tsArr);
 
-            await setTotalScoreOnProfile(
-              wallet,
-              profile.address!,
-              total,
-              baseCustom
-            );
+            // await setTotalScoreOnProfile(
+            //   wallet,
+            //   profile.address!,
+            //   total,
+            //   baseCustom
+            // );
             const updated = await createOrFetchProfile(wallet);
             const newXp = updated?.platformData?.xp ?? 0;
             console.log("[XP] Profile XP/Total updated", {
