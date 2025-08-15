@@ -12,10 +12,27 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import { fetchCharacters, type Character, getCharacterImageUri, equipResourceToCharacters } from "../hooks/useCharacter";
 import "../index.css"
 
+
+// Define BOARD_STYLES to access theme keys
+const BOARD_STYLES = {
+  cyberpunk: [],
+  neon: [],
+  pastel: [],
+  dark: [],
+  retro: [],
+  fruits: [],
+  gems: [],
+  shapes: [],
+  space: [],
+};
+
+
 const GamePage = () => {
   const wallet = useWallet();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [characters, setCharacters] = useState<Character[]>([]);
+
+
   useEffect(() => {
     if (wallet.connected && wallet.publicKey) {
       createOrFetchProfile(wallet)
@@ -50,11 +67,37 @@ const GamePage = () => {
     timer,
     score,
     total,
+    setTheme,
     startTheGame,
     endTheGame,
     regenerateBoard,
     handleDrop,
   } = useGameLogic();
+
+
+  // Set theme based on XP
+  useEffect(() => {
+    const xp = profile?.platformData?.xp ?? 0;
+    const themeKeys = Object.keys(BOARD_STYLES) as (keyof typeof BOARD_STYLES)[];
+    if (xp > 15000) {
+      setTheme(themeKeys[7]); // shapes
+    } else if (xp > 12000) {
+      setTheme(themeKeys[6]); // gems
+    } else if (xp > 10000) {
+      setTheme(themeKeys[5]); // fruits
+    } else if (xp > 7000) {
+      setTheme(themeKeys[4]); // retro
+    } else if (xp > 5000) {
+      setTheme(themeKeys[3]); // dark
+    } else if (xp > 3000) {
+      setTheme(themeKeys[2]); // pastel
+    } else if (xp > 1000) {
+      setTheme(themeKeys[1]); // neon
+    } else {
+      setTheme(themeKeys[0]); // cyberpunk
+    }
+  }, [profile?.platformData?.xp, setTheme]);
+
 
   const currentScore = score.reduce((sum, val) => sum + val, 0);
   const level = getLevelProgress(profile?.platformData?.xp);
@@ -279,7 +322,7 @@ const GamePage = () => {
                   onDragEnd={() => setDraggedTile(null)}
                   onDrop={() => handleDrop(index)}
                   style={{
-                    background: tileColor,
+                    background: tileColor.color,
                     boxShadow:
                       "inset 2px 2px 5px rgba(255, 255, 255, 0.2), inset -2px -2px 5px rgba(0, 0, 0, 0.5), 2px 2px 6px rgba(0, 0, 0, 0.7), 5px 5px 0px rgba(0, 0, 0, 0.3)",
                   }}
@@ -287,7 +330,7 @@ const GamePage = () => {
                     matched.has(index) ? "honey-destroy" : ""
                   } ${isResolving ? "pointer-events-none" : ""}`}
                 >
-                  {/* {tileColor} */}
+                  {tileColor.icon}
                 </div>
               ))}
             </div>
