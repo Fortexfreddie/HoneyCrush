@@ -162,22 +162,12 @@ src/
       Users.tsx          # User management
     HoneyComb/
       AssignMissionB...    # Mission assignment logic
-      CreateAssemble...    # Assembly creation
       CreateCharacter...   # Character creation
-      CreateMissionB...    # Mission creation (batch)
-      CreateMissionP...    # Mission creation (personal)
-      CreateNectarRe...    # Nectar resource creation
-      CreateProfilesTr...  # Profile transactions
-      CreateProjectBu...   # Project building
-      CreateResource...    # Resource creation
       DelegateForm.tsx     # Delegation form
       FetchCharacter...    # Character fetching
-      FundWall...          # Funding wall (incomplete)
-      GetHone...           # Honey retrieval (incomplete)
-      MintCharacterB...    # Character minting (batch)
-      MintResourceB...     # Resource minting (batch)
       ProjectDriverFo...   # Project driver (form)
       TransferResource...  # Resource transfer
+      .......
     Dashboard.tsx        # Landing, Featured Characters
     GamePage.tsx         # Gameplay + XP/Total persistence
     MissionsPage.tsx     # Static non-time-based missions
