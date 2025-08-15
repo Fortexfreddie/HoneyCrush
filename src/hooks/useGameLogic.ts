@@ -4,28 +4,28 @@ import { useGame } from '../contexts/GameContext'; // Adjust path as needed
 // Define the board styles with colors and icons
 const BOARD_STYLES = {
   cyberpunk: [
-    { id: 0, color: "#00eaff", icon: "⚡" },
-    { id: 1, color: "#ff00aa", icon: "🔮" },
-    { id: 2, color: "#7a5cff", icon: "💫" },
-    { id: 3, color: "#EFD09E", icon: "⭐" },
-    { id: 4, color: "#D4AA7D", icon: "🌟" },
-    { id: 5, color: "#9EEFD0", icon: "✨" },
+    { id: 0, color: "#00b7eb", icon: "⚡" }, // Cyan
+    { id: 1, color: "#e91e63", icon: "🔮" }, // Magenta
+    { id: 2, color: "#6a1b9a", icon: "💫" }, // Deep purple
+    { id: 3, color: "#26a69a", icon: "⭐" }, // Teal
+    { id: 4, color: "#ad1457", icon: "🌟" }, // Dark pink
+    { id: 5, color: "#0288d1", icon: "✨" }, // Blue
   ],
   neon: [
-    { id: 0, color: "#ff0080", icon: "🔥" },
-    { id: 1, color: "#00ff80", icon: "🌈" },
-    { id: 2, color: "#8000ff", icon: "🌟" },
-    { id: 3, color: "#ff8000", icon: "💥" },
-    { id: 4, color: "#0080ff", icon: "🌊" },
-    { id: 5, color: "#ffff00", icon: "💡" },
+    { id: 0, color: "#d81b60", icon: "🔥" }, // Neon pink
+    { id: 1, color: "#00c853", icon: "🌈" }, // Neon green
+    { id: 2, color: "#6200ea", icon: "🌟" }, // Neon purple
+    { id: 3, color: "#ff5722", icon: "💥" }, // Neon orange
+    { id: 4, color: "#0288d1", icon: "🌊" }, // Neon blue
+    { id: 5, color: "#c51162", icon: "💡" }, // Bright magenta
   ],
   pastel: [
-    { id: 0, color: "#ffb3d9", icon: "🌸" },
-    { id: 1, color: "#b3ffb3", icon: "🌼" },
-    { id: 2, color: "#b3d9ff", icon: "🌺" },
-    { id: 3, color: "#ffffb3", icon: "🌻" },
-    { id: 4, color: "#ffccb3", icon: "🌹" },
-    { id: 5, color: "#e6b3ff", icon: "🌷" },
+    { id: 0, color: "#f8bbd0", icon: "🌸" }, // Soft pink
+    { id: 1, color: "#c8e6c9", icon: "🌼" }, // Soft green
+    { id: 2, color: "#bbdefb", icon: "🌺" }, // Soft blue
+    { id: 3, color: "#fff9c4", icon: "🌻" }, // Soft yellow
+    { id: 4, color: "#ffccbc", icon: "🌹" }, // Soft peach
+    { id: 5, color: "#d1c4e9", icon: "🌷" }, // Soft lavender
   ],
   dark: [
     { id: 0, color: "#4a5568", icon: "🌑" },
@@ -36,36 +36,36 @@ const BOARD_STYLES = {
     { id: 5, color: "#4c1d95", icon: "🌖" },
   ],
   retro: [
-    { id: 0, color: "#ff6b6b", icon: "🎮" },
-    { id: 1, color: "#4ecdc4", icon: "🕹️" },
-    { id: 2, color: "#45b7d1", icon: "🖲️" },
-    { id: 3, color: "#f9ca24", icon: "🪙" },
-    { id: 4, color: "#f0932b", icon: "🎲" },
-    { id: 5, color: "#eb4d4b", icon: "🕹️" },
+    { id: 0, color: "#e57373", icon: "🎮" }, // Muted red
+  { id: 1, color: "#4db6ac", icon: "🕹️" }, // Muted teal
+  { id: 2, color: "#4fc3f7", icon: "🖲️" }, // Muted blue
+  { id: 3, color: "#ffb300", icon: "🪙" }, // Muted amber
+  { id: 4, color: "#ff8a65", icon: "🎲" }, // Muted orange
+  { id: 5, color: "#ef5350", icon: "🕹️" }, // Muted coral
   ],
   fruits: [
-    { id: 0, color: "#ff4757", icon: "🍎" },
-    { id: 1, color: "#ff6348", icon: "🍊" },
-    { id: 2, color: "#8e44ad", icon: "🍇" },
-    { id: 3, color: "#e74c3c", icon: "🍓" },
-    { id: 4, color: "#2ecc71", icon: "🥝" },
-    { id: 5, color: "#f1c40f", icon: "🍌" },
+    { id: 0, color: "#e74c3c", icon: "🍎" }, // Apple red
+    { id: 1, color: "#f39c12", icon: "🍊" }, // Orange
+    { id: 2, color: "#8e44ad", icon: "🍇" }, // Grape purple
+    { id: 3, color: "#c0392b", icon: "🍒" }, // Cherry deep red
+    { id: 4, color: "#27ae60", icon: "🥝" }, // Kiwi green
+    { id: 5, color: "#16a085", icon: "🥭" }, // Mango teal
   ],
   gems: [
-    { id: 0, color: "#3498db", icon: "💎" },
-    { id: 1, color: "#e74c3c", icon: "💍" },
-    { id: 2, color: "#9b59b6", icon: "🔷" },
-    { id: 3, color: "#f39c12", icon: "🔹" },
-    { id: 4, color: "#1abc9c", icon: "⭐" },
-    { id: 5, color: "#f1c40f", icon: "✨" },
+    { id: 0, color: "#3498db", icon: "💎" }, // Sapphire blue
+    { id: 1, color: "#e74c3c", icon: "💍" }, // Ruby red
+    { id: 2, color: "#9b59b6", icon: "🔷" }, // Amethyst purple
+    { id: 3, color: "#d35400", icon: "🔹" }, // Deep amber (replaced #f39c12)
+    { id: 4, color: "#1abc9c", icon: "⭐" }, // Emerald green
+    { id: 5, color: "#8e44ad", icon: "✨" }, // Rich amethyst (replaced #f1c40f)
   ],
   shapes: [
-    { id: 0, color: "#2c3e50", icon: "⚫" },
-    { id: 1, color: "#e74c3c", icon: "🔴" },
-    { id: 2, color: "#3498db", icon: "🔵" },
-    { id: 3, color: "#2ecc71", icon: "🟢" },
-    { id: 4, color: "#f1c40f", icon: "🟡" },
-    { id: 5, color: "#9b59b6", icon: "🟣" },
+    { id: 0, color: "#37474f", icon: "⚫" }, // Dark slate
+  { id: 1, color: "#d32f2f", icon: "🔴" }, // Deep red
+  { id: 2, color: "#0288d1", icon: "🔵" }, // Bright blue
+  { id: 3, color: "#388e3c", icon: "🟢" }, // Forest green
+  { id: 4, color: "#fbc02d", icon: "🟡" }, // Muted yellow
+  { id: 5, color: "#7b1fa2", icon: "🟣" }, // Deep purple
   ],
   space: [
     { id: 0, color: "#f39c12", icon: "🌟" },
