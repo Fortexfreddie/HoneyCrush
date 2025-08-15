@@ -155,7 +155,7 @@ export async function equipResourceToCharacters(wallet: WalletContextState) {
         characterModel: characterModelAddress.toString(), // The address of the character model
         characterAddress: characterAddress.toString(), // The character the resource is being equipped to
         resource: resourceAddress.toString(), // The address of the resource being equipped
-        owner: walletString, // The public key of the owner
+        owner: walletString || '', // The public key of the owner
         amount: "5",
       });
     await sendClientTransactions(
