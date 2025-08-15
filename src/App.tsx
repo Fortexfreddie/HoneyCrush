@@ -1,4 +1,4 @@
-import { Routes, Route, HashRouter } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import Dashboard from "./components/Dashboard";
 import Missions from "./pages/Missions";
@@ -17,32 +17,27 @@ import CreateMissions from "./components/Admin/Missions";
 function App() {
   return (
     <>
-      <HashRouter>
-        <Routes>
-          <Route path="/" element={<Home />}>
-            <Route index path="/dashboard" element={<Dashboard />} />
-          </Route>
-          <Route path="/missions" element={<Missions />} />
-          <Route
-            path="/game"
-            element={
-              <ProtectedRoute>
-                <Game />
-              </ProtectedRoute>
-            }
-          />
-          <Route path="/tutorial" element={<Tutorial />} />
-          <Route path="/maintenance" element={<Maintenance />} />
-          <Route path="/admin" element={<Admin />}>
-            <Route index element={<AdminDashboard />} />
-            <Route path="/admin/users" element={<Users />} />
-            <Route path="/admin/rewards" element={<Rewards />} />
-            <Route path="/admin/settings" element={<Settings />} />
-            <Route path="/admin/missions" element={<CreateMissions />} />
-          </Route>
-          <Route path="*" element={<NotFoundPage />} />
-        </Routes>
-      </HashRouter>
+      <Routes>
+        <Route path="/" element={<Home />}>
+          <Route index path="/dashboard" element={<Dashboard />} />
+        </Route>
+        <Route path="/missions" element={<Missions />} />
+        <Route path="/game" element={
+          <ProtectedRoute>
+            <Game />
+          </ProtectedRoute>
+        } />
+        <Route path="/tutorial" element={<Tutorial />} />
+        <Route path="/maintenance" element={<Maintenance />} />
+        <Route path="/admin" element={<Admin />}>
+          <Route index element={<AdminDashboard />} />
+          <Route path="/admin/users" element={<Users />} />
+          <Route path="/admin/rewards" element={<Rewards />} />
+          <Route path="/admin/settings" element={<Settings />} />
+          <Route path="/admin/missions" element={<CreateMissions />} />
+        </Route>
+        <Route path="*" element={<NotFoundPage />} />
+      </Routes>
     </>
   );
 }
