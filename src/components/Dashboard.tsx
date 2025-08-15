@@ -6,40 +6,51 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
-import { useRef } from "react";
+import { useRef, useEffect, useState } from "react";
 import {DashboardButton} from "./UI/Button";
 import { useNavigate } from "react-router-dom";
 import neonbee from "../assets/neon-bee-avatar-rare.png";
+import { useWallet } from "@solana/wallet-adapter-react";
+import { fetchCharacters, type Character, getCharacterImageUri } from "../hooks/useCharacter";
+// Local character images
+import ch1 from "../assets/characters/char1.jpg";
+import ch2 from "../assets/characters/char2.jpg";
+import ch3 from "../assets/characters/char3.jpg";
+import ch4 from "../assets/characters/char4.jpg";
+import ch5 from "../assets/characters/char5.jpg";
+import ch6 from "../assets/characters/char6.jpg";
 
-const avatars = [
-  { name: "Cyber Bee v1", rarity: "Rare", img: { neonbee } },
-  {
-    name: "Glitch Hornet",
-    rarity: "Epic",
-    img: { neonbee },
-  },
-  {
-    name: "Photon Wasp",
-    rarity: "Legendary",
-    img: { neonbee },
-  },
-  {
-    name: "Quantum Drone",
-    rarity: "Rare",
-    img: { neonbee },
-  },
-  { name: "Nova Bee", rarity: "Epic", img: { neonbee } },
+const localCharacters = [
+  { name: "Cyber Bee v1", levelRequired: 1, img: ch1 },
+  { name: "Glitch Hornet", levelRequired: 5, img: ch2 },
+  { name: "Photon Wasp", levelRequired: 10, img: ch3 },
+  { name: "Quantum Drone", levelRequired: 15, img: ch4 },
+  { name: "Nova Bee", levelRequired: 20, img: ch5 },
+  { name: "Nebula Queen", levelRequired: 25, img: ch6 },
 ];
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const ref = useRef<HTMLDivElement | null>(null);
+  const wallet = useWallet();
+  const [characters, setCharacters] = useState<Character[]>([]);
   const scrollBy = (dx: number) => {
     if (!ref.current) return;
     ref.current.scrollBy({ left: dx, behavior: "smooth" });
   };
+
+  // Fetch user's characters when wallet connects
+  useEffect(() => {
+    if (wallet.connected && wallet.publicKey) {
+      fetchCharacters(wallet)
+        .then((data) => setCharacters(data ?? []))
+        .catch((err) => console.error("[Dashboard] failed to fetch characters", err));
+    } else {
+      setCharacters([]);
+    }
+  }, [wallet, wallet.connected, wallet.publicKey]);
   return (
-    <div className="px-4 py-8 md:py-12">
+    <div className="px-4 py-8 md:py-12 font-rubik">
       <section className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
         <div className="p-6 md:p-8 rounded-[20px] bg-white/45 dark:bg-black/35 border border-white/35 dark:border-white/10 backdrop-blur-md shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
           <div className="flex items-center gap-2 text-xs uppercase tracking-widest text-gray-700 dark:text-gray-300">
@@ -82,7 +93,7 @@ const Dashboard = () => {
 
         <div className="p-6 md:p-4 rounded-[20px] bg-white/45 dark:bg-black/35 border border-white/35 dark:border-white/10 backdrop-blur-md shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-xl md:text-2xl font-bold">Featured Avatars</h3>
+            <h3 className="text-xl md:text-2xl font-bold">Featured Characters</h3>
             <div className="flex gap-2">
               <button
                 onClick={() => scrollBy(-300)}
@@ -102,20 +113,20 @@ const Dashboard = () => {
             ref={ref}
             className="flex gap-4 overflow-x-auto scroll-smooth pb-2"
           >
-            {avatars.map((nft, index) => (
-              <div key={index} className="min-w-[200px]">
+            {localCharacters.map((c, index) => (
+              <div key={c.name + index} className="min-w-[220px]">
                 <div className="rounded-2xl overflow-hidden border border-white/15 bg-white/40 dark:bg-black/30 backdrop-blur-xl shadow-lg">
                   <img
-                    src={nft.img.neonbee}
-                    alt={nft.name}
-                    className="w-full h-40 object-cover object-center"
+                    src={c.img}
+                    alt={c.name}
+                    className="w-full h-44 object-cover object-center"
                   />
                   <div className="p-3 flex items-center justify-between">
                     <div>
-                      <div className="font-bold">{nft.name}</div>
-                      <div className="text-xs opacity-75">{nft.rarity}</div>
+                      <div className="font-bold">{c.name}</div>
+                      <div className="text-xs opacity-75">Unlock at Level {c.levelRequired}</div>
                     </div>
-                    <span className="cursor-pointer px-2 py-1 rounded-lg bg-[#D4AA7D] text-black text-xs font-bold">
+                    <span className="px-2 py-1 rounded-lg bg-[#D4AA7D] text-black text-xs font-bold">
                       NFT
                     </span>
                   </div>

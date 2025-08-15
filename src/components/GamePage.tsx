@@ -7,10 +7,16 @@ import {
   createOrFetchProfile,
   addXpToProfile,
   getLevelProgress,
+  setTotalScoreOnProfile,
 } from "../hooks/useHoneycombProfile";
 import { useWallet } from "@solana/wallet-adapter-react";
-import { fetchCharacters, type Character, getCharacterImageUri, equipResourceToCharacters } from "../hooks/useCharacter";
-
+import {
+  fetchCharacters,
+  type Character,
+  getCharacterImageUri,
+  equipResourceToCharacters,
+} from "../hooks/useCharacter";
+import "../index.css";
 
 // Define BOARD_STYLES to access theme keys
 const BOARD_STYLES = {
@@ -25,17 +31,24 @@ const BOARD_STYLES = {
   space: [],
 };
 
-
 const GamePage = () => {
   const wallet = useWallet();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [characters, setCharacters] = useState<Character[]>([]);
 
-
   useEffect(() => {
     if (wallet.connected && wallet.publicKey) {
       createOrFetchProfile(wallet)
-        .then((profileData) => setProfile(profileData))
+        .then((profileData) => {
+          setProfile(profileData);
+          // Hydrate in-memory total from stored profile custom.totalScore without triggering XP award
+          const stored = Number(
+            profileData?.platformData?.custom?.totalScore ?? "0"
+          );
+          const safe = Number.isFinite(stored) ? stored : 0;
+          prevTotalRef.current = safe; // align ref before updating state to avoid false-positive delta
+          setTotal(safe);
+        })
         .catch((err) => {
           console.error("Profile error:", err);
         });
@@ -50,7 +63,9 @@ const GamePage = () => {
         .then((_Data) => {
           console.log("Equiped resource", _Data);
         })
-        .catch((err) => console.error("failed to equip resource to characters", err));
+        .catch((err) =>
+          console.error("failed to equip resource to characters", err)
+        );
     } else {
       setCharacters([]);
     }
@@ -66,6 +81,7 @@ const GamePage = () => {
     timer,
     score,
     total,
+    setTotal,
     setTheme,
     startTheGame,
     endTheGame,
@@ -73,30 +89,16 @@ const GamePage = () => {
     handleDrop,
   } = useGameLogic();
 
-
-  // Set theme based on XP
+  // Set theme based on Level progression (derived from XP)
   useEffect(() => {
-    const xp = profile?.platformData?.xp ?? 0;
-    const themeKeys = Object.keys(BOARD_STYLES) as (keyof typeof BOARD_STYLES)[];
-    if (xp > 15000) {
-      setTheme(themeKeys[7]); // shapes
-    } else if (xp > 12000) {
-      setTheme(themeKeys[6]); // gems
-    } else if (xp > 10000) {
-      setTheme(themeKeys[5]); // fruits
-    } else if (xp > 7000) {
-      setTheme(themeKeys[4]); // retro
-    } else if (xp > 5000) {
-      setTheme(themeKeys[3]); // dark
-    } else if (xp > 3000) {
-      setTheme(themeKeys[2]); // pastel
-    } else if (xp > 1000) {
-      setTheme(themeKeys[1]); // neon
-    } else {
-      setTheme(themeKeys[0]); // cyberpunk
-    }
+    const { level } = getLevelProgress(profile?.platformData?.xp);
+    const themeKeys = Object.keys(
+      BOARD_STYLES
+    ) as (keyof typeof BOARD_STYLES)[];
+    // Cycle themes as the player levels up
+    const idx = level % themeKeys.length;
+    setTheme(themeKeys[idx]);
   }, [profile?.platformData?.xp, setTheme]);
-
 
   const currentScore = score.reduce((sum, val) => sum + val, 0);
   const level = getLevelProgress(profile?.platformData?.xp);
@@ -138,16 +140,39 @@ const GamePage = () => {
         (async () => {
           try {
             await addXpToProfile(wallet, profile.address!, earnedXp);
+            // Persist absolute total to profile custom.totalScore and update matches played metadata
+            const baseCustom = { ...(profile.platformData?.custom ?? {}) } as Record<string, string>;
+            const prevMatches = Number(baseCustom.totalMatchesPlayed ?? "0");
+            const nowTs = Date.now();
+            let tsArr: number[] = [];
+            try {
+              tsArr = JSON.parse(baseCustom.matchesPlayedTimestamps ?? "[]");
+              if (!Array.isArray(tsArr)) tsArr = [];
+            } catch { tsArr = []; }
+            tsArr.push(nowTs);
+            // Keep only recent 200 entries to avoid bloating custom
+            if (tsArr.length > 200) tsArr = tsArr.slice(-200);
+            baseCustom.totalMatchesPlayed = String(prevMatches + 1);
+            baseCustom.lastMatchAt = String(nowTs);
+            baseCustom.matchesPlayedTimestamps = JSON.stringify(tsArr);
+
+            await setTotalScoreOnProfile(
+              wallet,
+              profile.address!,
+              total,
+              baseCustom
+            );
             const updated = await createOrFetchProfile(wallet);
             const newXp = updated?.platformData?.xp ?? 0;
-            console.log("[XP] Profile XP updated", {
+            console.log("[XP] Profile XP/Total updated", {
               prevXp,
               newXp,
-              delta: newXp - prevXp,
+              deltaXp: newXp - prevXp,
+              savedTotal: updated?.platformData?.custom?.totalScore,
             });
             setProfile(updated);
           } catch (e) {
-            console.error("[XP] Failed to update XP on timer end:", e);
+            console.error("[XP] Failed to update XP/Total on timer end:", e);
           }
         })();
       }
@@ -194,7 +219,7 @@ const GamePage = () => {
               </div>
               <div className="p-3 flex flex-col text-center rounded-xl bg-white/5 backdrop-blur-sm border border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
                 <span className="text-xs uppercase opacity-80">Xp</span>
-                <span className="text-2xl font-extrabold dark:text-[#EFD09E]">
+                <span className="text-2xl font-extrabold text-[#D4AA7D] dark:text-[#EFD09E]">
                   {profile?.platformData?.xp ?? 0}
                 </span>
               </div>
@@ -203,7 +228,7 @@ const GamePage = () => {
                   Total Score
                 </span>
                 <span className="text-2xl font-extrabold dark:text-[#9EEFD0]">
-                  {total}
+                  {Number(profile?.platformData?.custom?.totalScore ?? total ?? 0)}
                 </span>
               </div>
             </div>
@@ -231,17 +256,27 @@ const GamePage = () => {
                 onClick={() => {
                   startTheGame();
                 }}
-                className="bg-[#D4AA7D] hover:bg-[#EFD09E] text-black active:scale-95 active:translate-y-0 transition-transform duration-150"
+                className="bg-gradient-to-r 
+                from-[#D4AA7D] to-[#EFD09E] 
+                hover:from-[#EFD09E] hover:to-[#D4AA7D] 
+                text-black font-bold py-2 px-4 rounded-md 
+                shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out 
+                active:scale-95 focus:outline-none focus:ring-2 focus:ring-[#D4AA7D] 
+                focus:ring-opacity-50 dark:from-[#B38B5E] dark:to-[#D4AA7D]
+                 dark:hover:from-[#D4AA7D] dark:hover:to-[#B38B5E]"
               >
                 Start Game
               </Button>
               <Button
                 onClick={handleEndGame}
-                className="
-                   bg-transparent border-2 border-[#D4AA7D] text-[#D4AA7D] 
-                  hover:bg-[#D4AA7D] hover:text-black
-                    active:scale-95 active:translate-y-0 transition-transform duration-150
-                    "
+                className="bg-gradient-to-r 
+                from-[#D4AA7D] to-[#EFD09E] 
+                hover:from-[#EFD09E] hover:to-[#D4AA7D] 
+                text-black font-bold py-2 px-4 rounded-md 
+                shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out 
+                active:scale-95 focus:outline-none focus:ring-2 focus:ring-[#D4AA7D] 
+                focus:ring-opacity-50 dark:from-[#B38B5E] dark:to-[#D4AA7D]
+                 dark:hover:from-[#D4AA7D] dark:hover:to-[#B38B5E]"
               >
                 End Game
               </Button>
@@ -292,15 +327,14 @@ const GamePage = () => {
               </div>
               <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
                 {/* <User className="w-4 h-4 text-[#D4AA7D]" /> */}
-                 {firstCharacterImage && (
+                {firstCharacterImage && (
                   <img
                     src={firstCharacterImage}
                     alt="Character"
                     className="w-6 h-6 rounded-full object-cover border border-white/10"
                   />
                 )}
-                <span className="text-sm">NFT: Cyber Bee v1</span>
-               
+                <span className="text-xs">NFT: Cyber Bee v1</span>
               </div>
             </div>
           </div>
@@ -326,7 +360,7 @@ const GamePage = () => {
                       "inset 2px 2px 5px rgba(255, 255, 255, 0.2), inset -2px -2px 5px rgba(0, 0, 0, 0.5), 2px 2px 6px rgba(0, 0, 0, 0.7), 5px 5px 0px rgba(0, 0, 0, 0.3)",
                   }}
                   className={`w-full aspect-square rounded-xl md:rounded-2xl flex items-center justify-center text-lg font-bold text-gray-900 dark:text-gray-100 hover:scale-105 hover:ring-2 transition-all duration-200 cursor-pointer ${
-                    matched.has(index) ? "opacity-0 scale-75 blur-[1px]" : ""
+                    matched.has(index) ? "honey-destroy" : ""
                   } ${isResolving ? "pointer-events-none" : ""}`}
                 >
                   {tileColor.icon}

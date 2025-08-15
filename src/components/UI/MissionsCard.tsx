@@ -6,12 +6,11 @@ type MissionsCardProps = {
     description: string;
     nectar: number;
     xp: number;
-    tokens: number;
     valid?: string;
     onClaim?: () => void;
 };
 
-const MissionsCard = ({title, icon, description, nectar, xp, tokens, valid, onClaim}: MissionsCardProps) => {
+const MissionsCard = ({title, icon, description, nectar, xp, valid, onClaim}: MissionsCardProps) => {
     return (  
         <div className="p-4 rounded-2xl transition border border-white/10 hover:border-white/20 bg-white/40 dark:bg-black/30 backdrop-blur-xl shadow-lg">
             <div className="flex items-start justify-between gap-3">
@@ -30,9 +29,7 @@ const MissionsCard = ({title, icon, description, nectar, xp, tokens, valid, onCl
                     <span className="px-2 py-1 rounded-lg bg-[#EFD09E] text-black font-bold">
                         +{xp} XP
                     </span>
-                    <span className="px-2 py-1 rounded-lg bg-[#9EEFD0] text-black font-bold">
-                        +{tokens} Token(s)
-                    </span>
+                   
                     <span className="ml-2 opacity-80">{valid}</span>
                 </div>
             </div>
@@ -40,7 +37,7 @@ const MissionsCard = ({title, icon, description, nectar, xp, tokens, valid, onCl
                 onClaim && 
                 <Button 
                     onClick={onClaim} 
-                    className="bg-[#D4AA7D] hover:bg-[#EFD09E] text-black"
+                    className="bg-[#D4AA7D] p-2 rounded-sm hover:bg-[#EFD09E] text-black"
                 >
                     Claim
                 </Button>
