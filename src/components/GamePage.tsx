@@ -10,7 +10,7 @@ import {
 } from "../hooks/useHoneycombProfile";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { fetchCharacters, type Character, getCharacterImageUri, equipResourceToCharacters } from "../hooks/useCharacter";
-
+import "../index.css"
 const GamePage = () => {
   const wallet = useWallet();
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -39,6 +39,13 @@ const GamePage = () => {
     }
   }, [wallet, wallet.connected, wallet.publicKey]);
 
+  const bees = [
+    '/assets/bees/bee-1.png',
+    '/assets/bees/bee-2.png',
+    '/assets/bees/bee-3.png',
+    '/assets/bees/bee-4.png',
+    '/assets/bees/bee-5.png',
+  ]
   const {
     boardSize,
     board,
@@ -283,7 +290,7 @@ const GamePage = () => {
                       "inset 2px 2px 5px rgba(255, 255, 255, 0.2), inset -2px -2px 5px rgba(0, 0, 0, 0.5), 2px 2px 6px rgba(0, 0, 0, 0.7), 5px 5px 0px rgba(0, 0, 0, 0.3)",
                   }}
                   className={`w-full aspect-square rounded-xl md:rounded-2xl flex items-center justify-center text-lg font-bold text-gray-900 dark:text-gray-100 hover:scale-105 hover:ring-2 transition-all duration-200 cursor-pointer ${
-                    matched.has(index) ? "opacity-0 scale-75 blur-[1px]" : ""
+                    matched.has(index) ? "honey-destroy" : ""
                   } ${isResolving ? "pointer-events-none" : ""}`}
                 >
                   {/* {tileColor} */}

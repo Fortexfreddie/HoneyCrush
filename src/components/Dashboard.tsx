@@ -39,7 +39,7 @@ const Dashboard = () => {
     ref.current.scrollBy({ left: dx, behavior: "smooth" });
   };
   return (
-    <div className="px-4 py-8 md:py-12">
+    <div className="px-4 py-8 md:py-12 font-rubik">
       <section className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
         <div className="p-6 md:p-8 rounded-[20px] bg-white/45 dark:bg-black/35 border border-white/35 dark:border-white/10 backdrop-blur-md shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
           <div className="flex items-center gap-2 text-xs uppercase tracking-widest text-gray-700 dark:text-gray-300">
@@ -82,7 +82,7 @@ const Dashboard = () => {
 
         <div className="p-6 md:p-4 rounded-[20px] bg-white/45 dark:bg-black/35 border border-white/35 dark:border-white/10 backdrop-blur-md shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-xl md:text-2xl font-bold">Featured Avatars</h3>
+            <h3 className="text-xl md:text-2xl font-bold">Featured Characters</h3>
             <div className="flex gap-2">
               <button
                 onClick={() => scrollBy(-300)}
