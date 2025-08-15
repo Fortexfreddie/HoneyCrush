@@ -205,4 +205,4 @@ Issues and PRs are welcome. For feature requests, please open an issue describin
 
 ## License
 
-This project is provided under the MIT License. See `LICENSE` (or add one if missing).
+This project is provided under the MIT License. See `LICENSE`.
