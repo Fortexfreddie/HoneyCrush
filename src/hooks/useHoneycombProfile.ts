@@ -314,3 +314,53 @@ export async function addXpToProfile(
     createUpdatePlatformDataTransaction
   );
 }
+
+/**
+ * Set the user's total score into platformData.custom.totalScore (stringified integer).
+ * Provide baseCustom if you want to preserve existing keys; otherwise only totalScore is set.
+ */
+export async function setTotalScoreOnProfile(
+  wallet: WalletContextState,
+  profileAddress: string,
+  totalScore: number,
+  baseCustom?: Record<string, string>
+): Promise<void> {
+  if (!wallet.publicKey) throw new Error("Wallet not connected");
+  if (totalScore < 0) return;
+
+  const payer = wallet.publicKey.toBase58();
+  const custom = {
+    ...(baseCustom ?? {}),
+    totalScore: Math.max(0, Math.floor(totalScore)).toString(),
+  };
+
+  const { createUpdatePlatformDataTransaction } = await client.createUpdatePlatformDataTransaction({
+    authority: payer,
+    payer,
+    profile: profileAddress,
+    platformData: { custom },
+  });
+
+  await sendClientTransactions(
+    client,
+    wallet,
+    createUpdatePlatformDataTransaction
+  );
+}
+
+/**
+ * Increment the user's total score by deltaScore using current stored total as a base.
+ * If currentStoredTotal is omitted, caller should pass baseCustom containing an up-to-date value.
+ */
+export async function addScoreToProfile(
+  wallet: WalletContextState,
+  profileAddress: string,
+  deltaScore: number,
+  currentStoredTotal?: number,
+  baseCustom?: Record<string, string>
+): Promise<void> {
+  if (deltaScore <= 0) return;
+  const prev = Math.max(0, Math.floor(Number(currentStoredTotal ?? 0)));
+  const next = prev + Math.max(0, Math.floor(deltaScore));
+  await setTotalScoreOnProfile(wallet, profileAddress, next, baseCustom);
+}

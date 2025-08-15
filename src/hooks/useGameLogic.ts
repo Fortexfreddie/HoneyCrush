@@ -353,6 +353,7 @@ export function useGameLogic() {
     timer,
     score,
     total,
+    setTotal, // expose so GamePage can hydrate from profile
     theme,
     setTheme,
     startTheGame,
