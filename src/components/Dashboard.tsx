@@ -6,13 +6,12 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
-import { useRef, useEffect, useState } from "react";
+import { useRef, } from "react";
 import {DashboardButton} from "./UI/Button";
 import { useNavigate } from "react-router-dom";
-import neonbee from "../assets/neon-bee-avatar-rare.png";
-import { useWallet } from "@solana/wallet-adapter-react";
-import { fetchCharacters, type Character, getCharacterImageUri } from "../hooks/useCharacter";
-// Local character images
+// import { useWallet } from "@solana/wallet-adapter-react";
+// import { fetchCharacters, type Character, } from "../hooks/useCharacter";
+// // Local character images
 import ch1 from "../assets/characters/char1.jpg";
 import ch2 from "../assets/characters/char2.jpg";
 import ch3 from "../assets/characters/char3.jpg";
@@ -32,23 +31,23 @@ const localCharacters = [
 const Dashboard = () => {
   const navigate = useNavigate();
   const ref = useRef<HTMLDivElement | null>(null);
-  const wallet = useWallet();
-  const [characters, setCharacters] = useState<Character[]>([]);
+  // const wallet = useWallet();
+  // const [characters, setCharacters] = useState<Character[]>([]);
   const scrollBy = (dx: number) => {
     if (!ref.current) return;
     ref.current.scrollBy({ left: dx, behavior: "smooth" });
   };
 
   // Fetch user's characters when wallet connects
-  useEffect(() => {
-    if (wallet.connected && wallet.publicKey) {
-      fetchCharacters(wallet)
-        .then((data) => setCharacters(data ?? []))
-        .catch((err) => console.error("[Dashboard] failed to fetch characters", err));
-    } else {
-      setCharacters([]);
-    }
-  }, [wallet, wallet.connected, wallet.publicKey]);
+  // useEffect(() => {
+  //   if (wallet.connected && wallet.publicKey) {
+  //     fetchCharacters(wallet)
+  //       .then((data) => setCharacters(data ?? []))
+  //       .catch((err) => console.error("[Dashboard] failed to fetch characters", err));
+  //   } else {
+  //     setCharacters([]);
+  //   }
+  // }, [wallet, wallet.connected, wallet.publicKey]);
   return (
     <div className="px-4 py-8 md:py-12 font-rubik">
       <section className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">

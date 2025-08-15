@@ -5,7 +5,7 @@ import {Button} from "./UI/Button";
 import { useRef } from "react";
 
 const WalletRequiredModal = () => {
-    const {isOpen, setIsOpen} = useWalletRequiredModal();
+    const {setIsOpen} = useWalletRequiredModal();
     const walletMultiButtonWrapperRef = useRef<HTMLDivElement>(null);
 
     const handleClick = () => {

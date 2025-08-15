@@ -157,7 +157,7 @@ export function getLevelProgress(totalXp?: number | null) {
  */
 function getProjectId(): string {
   const ls = typeof window !== "undefined" ? window.localStorage.getItem("honeycomb_project") : null;
-  const env = (import.meta as any)?.env?.VITE_HONEYCOMB_PROJECT_ID as string | undefined;
+  const env = import.meta.env?.VITE_HONEYCOMB_PROJECT_ID as string | undefined;
   const project = ls || env;
   if (!project) throw new Error("Project ID not configured. Set localStorage.honeycomb_project or VITE_HONEYCOMB_PROJECT_ID");
   return project;
@@ -195,7 +195,7 @@ export async function createNectarResource(
   await sendClientTransactions(
     client,
     wallet,
-    createCreateNewResourceTransaction()
+    createCreateNewResourceTransaction.tx
   );
 
   // If available in response, return the resource address
@@ -234,10 +234,10 @@ export async function createXpResource(
   await sendClientTransactions(
     client,
     wallet,
-    createCreateNewResourceTransaction
+    createCreateNewResourceTransaction.tx 
   );
 
-  return (createCreateNewResourceTransaction as any)?.resource;
+  return createCreateNewResourceTransaction?.resource;
 }
 
 /**
