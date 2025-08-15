@@ -2,20 +2,32 @@ import { useState, useRef, useEffect } from "react";
 import { useGame } from "../contexts/GameContext";
 
 const COLORS = [
-  "#FF0000", "#00CED1", "#FFD700", "#8A2BE2", "#0000FF", "#FF1493", "#00FF7F", "#FF6347",
+  "#FF0000",
+  "#00CED1",
+  "#FFD700",
+  "#8A2BE2",
+  "#0000FF",
+  "#FF1493",
+  "#00FF7F",
+  "#FF6347",
 ];
 
-const getRandomColor = (colors: string[]) => colors[Math.floor(Math.random() * colors.length)];
+const getRandomColor = (colors: string[]) =>
+  colors[Math.floor(Math.random() * colors.length)];
 
 export function useGameLogic() {
   const timerRef = useRef<number | null>(null);
   const { timer, setTimer, setScore, score, total, setTotal } = useGame();
   const currentScore = score.reduce((sum, val) => sum + val, 0);
   const scoreRef = useRef<number>(currentScore);
-  useEffect(() => { scoreRef.current = currentScore; }, [currentScore]);
+  useEffect(() => {
+    scoreRef.current = currentScore;
+  }, [currentScore]);
 
   const [boardSize, setBoardSize] = useState<number>(36);
-  const [board, setBoard] = useState<string[]>([...Array(36)].map(() => getRandomColor(COLORS)));
+  const [board, setBoard] = useState<string[]>(
+    [...Array(36)].map(() => getRandomColor(COLORS))
+  );
   const [draggedTile, setDraggedTile] = useState<number | null>(null);
   const width = boardSize === 36 ? 6 : 4;
   const [matched, setMatched] = useState<Set<number>>(new Set());
@@ -41,7 +53,10 @@ export function useGameLogic() {
       return;
     }
     const swapped = [...board];
-    [swapped[draggedTile], swapped[targetIndex]] = [swapped[targetIndex], swapped[draggedTile]];
+    [swapped[draggedTile], swapped[targetIndex]] = [
+      swapped[targetIndex],
+      swapped[draggedTile],
+    ];
     const m = checkMatches(swapped, width);
     if (m.size === 0) {
       setDraggedTile(null);
@@ -52,7 +67,8 @@ export function useGameLogic() {
     await resolveBoard(swapped, width);
   };
 
-  const handleCleared = (cleared: number) => setScore((prev) => [...prev, cleared]);
+  const handleCleared = (cleared: number) =>
+    setScore((prev) => [...prev, cleared]);
 
   const checkMatches = (board: string[], width: number): Set<number> => {
     const matched = new Set<number>();
@@ -62,10 +78,14 @@ export function useGameLogic() {
       while (c <= width - 3) {
         const start = r * width + c;
         const color = board[start];
-        if (!color) { c++; continue; }
+        if (!color) {
+          c++;
+          continue;
+        }
         let run = 1;
         while (c + run < width && board[r * width + (c + run)] === color) run++;
-        if (run >= 3) for (let k = 0; k < run; k++) matched.add(r * width + c + k);
+        if (run >= 3)
+          for (let k = 0; k < run; k++) matched.add(r * width + c + k);
         c += run;
       }
     }
@@ -74,10 +94,15 @@ export function useGameLogic() {
       while (r <= height - 3) {
         const start = r * width + c;
         const color = board[start];
-        if (!color) { r++; continue; }
+        if (!color) {
+          r++;
+          continue;
+        }
         let run = 1;
-        while (r + run < height && board[(r + run) * width + c] === color) run++;
-        if (run >= 3) for (let k = 0; k < run; k++) matched.add((r + k) * width + c);
+        while (r + run < height && board[(r + run) * width + c] === color)
+          run++;
+        if (run >= 3)
+          for (let k = 0; k < run; k++) matched.add((r + k) * width + c);
         r += run;
       }
     }
@@ -85,14 +110,20 @@ export function useGameLogic() {
   };
 
   const isAdjacent = (a: number, b: number, width: number): boolean => {
-    if (Math.floor(a / width) === Math.floor(b / width) && Math.abs(a - b) === 1) return true;
+    if (
+      Math.floor(a / width) === Math.floor(b / width) &&
+      Math.abs(a - b) === 1
+    )
+      return true;
     if (Math.abs(a - b) === width) return true;
     return false;
   };
 
   const clearMatches = (grid: string[], matches: Set<number>) => {
     const next: (string | null)[] = [...grid];
-    matches.forEach((idx) => { next[idx] = null; });
+    matches.forEach((idx) => {
+      next[idx] = null;
+    });
     return { board: next, cleared: matches.size };
   };
 
@@ -107,8 +138,13 @@ export function useGameLogic() {
         if (val) stack.push(val);
       }
       let r = height - 1;
-      for (const val of stack) { next[r * width + c] = val; r--; }
-      for (; r >= 0; r--) { next[r * width + c] = null; }
+      for (const val of stack) {
+        next[r * width + c] = val;
+        r--;
+      }
+      for (; r >= 0; r--) {
+        next[r * width + c] = null;
+      }
     }
     return next;
   };
@@ -117,9 +153,11 @@ export function useGameLogic() {
     grid.map((v) => (v ? v : getRandomColor(colors)));
 
   const hasPossibleMoves = (grid: string[], width: number): boolean => {
-    const size = grid.length, height = Math.floor(size / width);
+    const size = grid.length,
+      height = Math.floor(size / width);
     for (let i = 0; i < size; i++) {
-      const r = Math.floor(i / width), c = i % width;
+      const r = Math.floor(i / width),
+        c = i % width;
       if (c + 1 < width) {
         const j = i + 1;
         if (grid[j] !== grid[i]) {
@@ -161,7 +199,10 @@ export function useGameLogic() {
     let current: string[] = initial;
     while (true) {
       const matches = checkMatches(current, w);
-      if (matches.size === 0) { setMatched(new Set()); break; }
+      if (matches.size === 0) {
+        setMatched(new Set());
+        break;
+      }
       setMatched(matches);
       await sleep(200);
       const { board: clearedBoard, cleared } = clearMatches(current, matches);
@@ -196,7 +237,10 @@ export function useGameLogic() {
   };
 
   const startTheGame = async () => {
-    if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
     setScore([]);
     setTimer(120);
     setMatched(new Set());
@@ -205,7 +249,10 @@ export function useGameLogic() {
     timerRef.current = window.setInterval(() => {
       setTimer((prev) => {
         if (prev <= 1) {
-          if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
+          if (timerRef.current) {
+            clearInterval(timerRef.current);
+            timerRef.current = null;
+          }
           const roundScore = scoreRef.current;
           // Defer cross-state updates to avoid nested setState during a state updater (React warning)
           setTimeout(() => {

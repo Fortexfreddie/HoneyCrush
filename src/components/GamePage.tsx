@@ -11,6 +11,7 @@ import {
 import { useWallet } from "@solana/wallet-adapter-react";
 import { fetchCharacters, type Character, getCharacterImageUri, equipResourceToCharacters } from "../hooks/useCharacter";
 import "../index.css"
+
 const GamePage = () => {
   const wallet = useWallet();
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -39,13 +40,6 @@ const GamePage = () => {
     }
   }, [wallet, wallet.connected, wallet.publicKey]);
 
-  const bees = [
-    '/assets/bees/bee-1.png',
-    '/assets/bees/bee-2.png',
-    '/assets/bees/bee-3.png',
-    '/assets/bees/bee-4.png',
-    '/assets/bees/bee-5.png',
-  ]
   const {
     boardSize,
     board,
