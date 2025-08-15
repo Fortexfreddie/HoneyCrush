@@ -2,7 +2,7 @@ import { client } from "../lib/honeycombClient";
 import { sendClientTransactions } from "@honeycomb-protocol/edge-client/client/walletHelpers";
 import type { WalletContextState } from "@solana/wallet-adapter-react";
 import { ResourceStorageEnum } from "@honeycomb-protocol/edge-client";
-
+import type { CustomDataInput } from "@honeycomb-protocol/edge-client";
 export interface Profile {
     address?: string;
     info?: {
@@ -329,10 +329,18 @@ export async function setTotalScoreOnProfile(
   if (totalScore < 0) return;
 
   const payer = wallet.publicKey.toBase58();
-  const custom = {
-    ...(baseCustom ?? {}),
-    totalScore: Math.max(0, Math.floor(totalScore)).toString(),
-  };
+
+  // Merge baseCustom and ensure string values; let totalScore override
+  const kv = new Map<string, string>();
+  if (baseCustom) {
+    for (const [k, v] of Object.entries(baseCustom)) {
+      kv.set(k, typeof v === "string" ? v : String(v));
+    }
+  }
+  kv.set("totalScore", String(Math.max(0, Math.floor(totalScore))));
+
+  // Convert to CustomDataInput (array of { key, value })
+  const custom: CustomDataInput = Array.from(kv.entries()).map(([key, value]) => ({ key, value }));
 
   const { createUpdatePlatformDataTransaction } = await client.createUpdatePlatformDataTransaction({
     authority: payer,
@@ -341,13 +349,8 @@ export async function setTotalScoreOnProfile(
     platformData: { custom },
   });
 
-  await sendClientTransactions(
-    client,
-    wallet,
-    createUpdatePlatformDataTransaction
-  );
+  await sendClientTransactions(client, wallet, createUpdatePlatformDataTransaction);
 }
-
 /**
  * Increment the user's total score by deltaScore using current stored total as a base.
  * If currentStoredTotal is omitted, caller should pass baseCustom containing an up-to-date value.

@@ -6,7 +6,7 @@ import { useWalletRequiredModal } from "../contexts/WalletRequiredModalContext";
 
 
 const Game = () => {
-    const {isOpen, setIsOpen} = useWalletRequiredModal();
+    const {isOpen,} = useWalletRequiredModal();
     return (  
         <div className="min-h-screen flex flex-col text-gray-900 dark:text-gray-100 bg-gray-200 dark:bg-[#272727]">
           {
