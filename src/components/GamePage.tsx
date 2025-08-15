@@ -38,6 +38,7 @@ const GamePage = () => {
 
   useEffect(() => {
     if (wallet.connected && wallet.publicKey) {
+      
       createOrFetchProfile(wallet)
         .then((profileData) => {
           setProfile(profileData);

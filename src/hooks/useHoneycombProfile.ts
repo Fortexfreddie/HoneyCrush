@@ -367,3 +367,8 @@ export async function addXpToProfile(
 //   const next = prev + Math.max(0, Math.floor(deltaScore));
 //   await setTotalScoreOnProfile(wallet, profileAddress, next, baseCustom);
 // }
+
+
+export async function assignSol(){
+
+}
