@@ -7,7 +7,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { useRef } from "react";
-import {Button, DashboardButton} from "./UI/Button";
+import {DashboardButton} from "./UI/Button";
 import { useNavigate } from "react-router-dom";
 import neonbee from "../assets/neon-bee-avatar-rare.png";
 
@@ -62,11 +62,11 @@ const Dashboard = () => {
             </DashboardButton>
             <DashboardButton
               onClick={() => navigate("/tutorial")}
-              className="w-full sm:w-auto bg-transparent border-2 border-[#D4AA7D] text-[#D4AA7D]  hover:text-black"
+              className="w-full sm:w-auto bg-transparent border-2 border-[#D4AA7D] text-[#D4AA7D]"
             >
               Learn How It Works
             </DashboardButton>
-            <DashboardButton className="w-full sm:w-auto bg-white/20 dark:bg-white/10 text-black dark:text-white hover:bg-white/30 dark:hover:bg-white/20">
+            <DashboardButton className="w-full sm:w-auto border-1 bg-white/20 dark:bg-white/10 text-black dark:text-white hover:bg-white/30 dark:hover:bg-white/20">
               <Wallet className="w-4 h-4 mr-2" />
               Connect Wallet
             </DashboardButton>
@@ -80,7 +80,7 @@ const Dashboard = () => {
           </div>
         </div>
 
-        <div className="p-6 md:p-8 rounded-[20px] bg-white/45 dark:bg-black/35 border border-white/35 dark:border-white/10 backdrop-blur-md shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
+        <div className="p-6 md:p-4 rounded-[20px] bg-white/45 dark:bg-black/35 border border-white/35 dark:border-white/10 backdrop-blur-md shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-xl md:text-2xl font-bold">Featured Avatars</h3>
             <div className="flex gap-2">

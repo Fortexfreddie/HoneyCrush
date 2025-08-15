@@ -65,14 +65,14 @@ const Header = () => {
         <div className="flex items-center gap-2">
           <Button
             onClick={toggleTheme}
-            className={`rounded-full p-2 bg-white/40 dark:bg-black/30 backdrop-blur-md border border-white/20 hover:border-black/40 dark:hover:border-white/40 ${
+            className={`rounded-full size-9 p-2 bg-white/40 dark:bg-black/30 backdrop-blur-md border border-white/20 hover:border-black/40 dark:hover:border-white/40 ${
               isDarkMode ? "rotate-180" : ""
             }`}
           >
             {isDarkMode ? (
-              <Sun className="w-5 h-5 text-[#D4AA7D]" />
+              <Sun className=" text-[#D4AA7D]" />
             ) : (
-              <Moon className="w-5 h-5 text-[#D4AA7D]" />
+              <Moon className=" text-[#D4AA7D]" />
             )}
           </Button>
           <WalletMultiButton />
