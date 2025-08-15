@@ -9,7 +9,7 @@ import {
   getLevelProgress,
 } from "../hooks/useHoneycombProfile";
 import { useWallet } from "@solana/wallet-adapter-react";
-import { fetchCharacters, type Character, getCharacterImageUri } from "../hooks/useCharacter";
+import { fetchCharacters, type Character, getCharacterImageUri, equipResourceToCharacters } from "../hooks/useCharacter";
 
 const GamePage = () => {
   const wallet = useWallet();
@@ -28,6 +28,12 @@ const GamePage = () => {
           setCharacters(characterData ?? []);
         })
         .catch((err) => console.error("failed to fetch characters", err));
+
+      equipResourceToCharacters(wallet)
+        .then((_Data) => {
+          console.log("Equiped resource", _Data);
+        })
+        .catch((err) => console.error("failed to equip resource to characters", err));
     } else {
       setCharacters([]);
     }
